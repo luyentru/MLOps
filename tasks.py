@@ -1,4 +1,5 @@
 import os
+import sys
 
 from invoke import Context, task
 
@@ -9,17 +10,32 @@ PYTHON_VERSION = "3.11"
 # Setup commands
 @task
 def create_environment(ctx: Context) -> None:
-    """Create a new conda environment for project."""
+    """Create a new conda environment for the project and install invoke."""
     ctx.run(
         f"conda create --name {PROJECT_NAME} python={PYTHON_VERSION} pip --no-default-packages --yes",
         echo=True,
         pty=not WINDOWS,
     )
+    ctx.run(
+        f"conda run -n {PROJECT_NAME} pip install invoke",
+        echo=True,
+        pty=not WINDOWS,
+    )
+    
+@task
+def delete_environment(ctx: Context) -> None:
+    """Delete the conda environment for project."""
+    ctx.run(f"conda deactivate", echo=True, pty=not WINDOWS)
+    ctx.run(f"conda remove --name {PROJECT_NAME} --all --yes", echo=True, pty=not WINDOWS)
 
 @task
 def requirements(ctx: Context) -> None:
     """Install project requirements."""
-    ctx.run("pip install -U pip setuptools wheel", echo=True, pty=not WINDOWS)
+    ctx.run(
+        f"{sys.executable} -m pip install -U pip setuptools wheel",
+        echo=True,
+        pty=not WINDOWS,
+    )
     ctx.run("pip install -r requirements.txt", echo=True, pty=not WINDOWS)
     ctx.run("pip install -e .", echo=True, pty=not WINDOWS)
 
