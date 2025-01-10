@@ -1,7 +1,10 @@
 docs/site/
 
 # data files
-data/processed/
+data/
+
+# notebook files
+*.ipynb
 
 # test cache
 manual_test/
