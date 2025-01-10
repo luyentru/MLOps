@@ -14,7 +14,7 @@ import torch
 class MyDataset(Dataset):
     """Custom dataset for processing images and labels from a CSV file."""
 
-    def __init__(self, csv_file: Path, transform: Optional[transforms.Compose] = None) -> None:
+    def __init__(self, csv_file: Path, split: str, transform: Optional[transforms.Compose] = None) -> None:
         """
         Initialize the dataset from a CSV file.
 
@@ -25,6 +25,9 @@ class MyDataset(Dataset):
         if not csv_file.exists():
             raise FileNotFoundError(f"CSV file not found: {csv_file}")
         self.data = pd.read_csv(csv_file)
+        self.data = self.data[self.data["split"] == split]
+        self.labels = self.data["label"].unique()
+        self.num_classes = len(self.labels)
         self.transform = transform
 
     def __len__(self) -> int:
