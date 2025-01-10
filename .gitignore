@@ -1,5 +1,9 @@
 docs/site/
 
+# data files
+data/pets_facial_expression_dataset/
+data/data.csv
+
 # test cache
 manual_test/
 
