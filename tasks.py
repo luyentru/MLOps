@@ -40,9 +40,27 @@ def preprocess(ctx: Context) -> None:
 
 
 @task
-def train(ctx: Context) -> None:
+def trainEffNet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
+
+
+@task
+def trainResnet(ctx: Context) -> None:
+    """Train model."""
+    ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name resnet50", echo=True, pty=not WINDOWS)
+
+
+@task
+def trainVgg(ctx: Context) -> None:
+    """Train model."""
+    ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name vgg16", echo=True, pty=not WINDOWS)
+
+
+@task
+def evaluate(ctx: Context) -> None:
+    """Train model."""
+    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py models/model.pth", echo=True, pty=not WINDOWS)
 
 
 @task
