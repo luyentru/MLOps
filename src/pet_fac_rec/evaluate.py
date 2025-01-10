@@ -1,8 +1,8 @@
 import torch
 import typer
 from pathlib import Path
-from model import MyEfficientNetModel
-from data import MyDataset, get_default_transforms
+from pet_fac_rec.model import MyEfficientNetModel
+from pet_fac_rec.data import MyDataset, get_default_transforms
 
 
 def evaluate(model_checkpoint: str, data_csv: Path = Path("data/data.csv")) -> None:

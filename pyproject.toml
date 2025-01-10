@@ -19,9 +19,9 @@ requires-python = ">=3.11"
 dynamic = ["dependencies", "optional-dependencies"]
 
 [project.scripts]
-train = "pet_fac_rec.train:main"
+train = "pet_fac_rec.train:app"
 evaluate = "pet_fac_rec.evaluate:main"
-preprocess = "pet_fac_rec.preprocess:main"
+preprocess = "pet_fac_rec.data:main"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

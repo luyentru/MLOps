@@ -6,8 +6,8 @@ import numpy as np
 from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
-from data import MyDataset, get_default_transforms
+from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
+from pet_fac_rec.data import MyDataset, get_default_transforms
 from tqdm import tqdm
 
 app = typer.Typer()
