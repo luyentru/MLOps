@@ -9,13 +9,14 @@ from data import MyDataset, get_default_transforms
 
 # Determine the device to use for training
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+print(DEVICE)
 
 
 def train(
     lr: float = 1e-3,
     batch_size: int = 32,
-    epochs: int = 10,
-    data_csv: Path = Path("data/processed/data.csv"),
+    epochs: int = 1,
+    data_csv: Path = Path("data/data.csv"),
     num_classes: int = 10,
 ) -> None:
     """

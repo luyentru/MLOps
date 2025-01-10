@@ -3,6 +3,7 @@ from torch import nn
 from torchvision.models import efficientnet_b5, EfficientNet_B5_Weights
 from typing import Tuple
 
+
 class MyEfficientNetModel(nn.Module):
     """
     A model leveraging EfficientNet as the base feature extractor.
@@ -53,6 +54,7 @@ class MyEfficientNetModel(nn.Module):
         x = self.base_model(x)
         x = self.fc_layers(x)
         return x
+
 
 if __name__ == "__main__":
     # Example usage

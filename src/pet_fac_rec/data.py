@@ -1,24 +1,26 @@
 from pathlib import Path
 import os
 import pandas as pd
-import shutil
 import kagglehub as kh
+import shutil
+from typing import Optional, Tuple
 import typer
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
 import torch
 
-class MyDataset(Dataset):
-    """My custom dataset."""
 
-    def __init__(self, csv_file: Path, transform=None) -> None:
+class MyDataset(Dataset):
+    """Custom dataset for processing images and labels from a CSV file."""
+
+    def __init__(self, csv_file: Path, transform: Optional[transforms.Compose] = None) -> None:
         """
         Initialize the dataset from a CSV file.
 
         Args:
             csv_file (Path): Path to the CSV file containing file paths and labels.
-            transform: Transformations to apply to the images.
+            transform (Optional[transforms.Compose]): Transformations to apply to the images.
         """
         if not csv_file.exists():
             raise FileNotFoundError(f"CSV file not found: {csv_file}")
@@ -29,17 +31,17 @@ class MyDataset(Dataset):
         """Return the length of the dataset."""
         return len(self.data)
 
-    def __getitem__(self, index: int):
-        """Return a given sample from the dataset.
+    def __getitem__(self, index: int) -> Tuple[Image.Image, int]:
+        """Return a specific sample from the dataset.
 
         Args:
             index (int): Index of the sample to retrieve.
 
         Returns:
-            Tuple[torch.Tensor, int]: Transformed image and its label.
+            Tuple[Image.Image, int]: Transformed image and its label.
         """
         row = self.data.iloc[index]
-        image_path = row["file_path"]
+        image_path = Path(row["file_path"])
         label = int(row["label"])
 
         # Load and transform the image
@@ -48,6 +50,7 @@ class MyDataset(Dataset):
             image = self.transform(image)
 
         return image, label
+
 
 def preprocess(output_folder: Path) -> None:
     """
@@ -62,57 +65,55 @@ def preprocess(output_folder: Path) -> None:
     # Download dataset if not already present
     if not any(output_folder.iterdir()):
         print("Downloading dataset...")
-        download_path = kh.dataset_download("anshtanwar/pets-facial-expression-dataset")
+        download_path = Path(kh.dataset_download("anshtanwar/pets-facial-expression-dataset"))
         print("Path to dataset files:", download_path)
 
-        # Move dataset to the target directory
-        shutil.move(download_path, output_folder)
-        print(f"Dataset moved to: {output_folder}")
+        master_folder_path = download_path / "Master Folder"
 
-    # Define the root directory of the dataset
-    root_dir = output_folder / "11/Master Folder"
+        if master_folder_path.exists():
+            # Move each file/subfolder in the Master_folder to the output directory
+            for item in master_folder_path.iterdir():
+                shutil.move(str(item), str(output_folder))
+            print(f"Contents of 'Master Folder' moved to: {output_folder}")
+        else:
+            print("Master Folder not found in the dataset.")
 
-    # Initialize an empty list to store data
+    # Walk through each subdirectory and file to create a data list
     data = []
+    label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
-    # Define label mapping
-    label_mapping = {"happy": 0, "Sad": 1, "Angry": 2, "Other": 3} 
-
-    # Walk through each subdirectory and file
     for split in ["train", "valid", "test"]:
-        split_path = root_dir / split
-        for label in os.listdir(split_path):  # Angry, Happy, Sad, etc.
-            label_path = split_path / label
-            if label_path.is_dir():
-                for file in os.listdir(label_path):
-                    file_path = label_path / file
-                    if os.path.isfile(file_path):
-                        # Append file path and label to the data list
-                        if label in label_mapping:
-                            data.append({
+        split_path = output_folder / split
+        for label_dir in split_path.iterdir():
+            if label_dir.is_dir():
+                for file in label_dir.iterdir():
+                    if file.is_file():
+                        # Map the label and store file path and label
+                        data.append(
+                            {
                                 "split": split,
-                                "label": label_mapping[label],  # Convert string label to integer
-                                "file_path": str(file_path)
-                            })
-                        else:
-                            print(f"Warning: Label '{label}' not found in label mapping")
+                                "label": label_mapping.get(label_dir.name.lower(), -1),
+                                "file_path": str(file),
+                            }
+                        )
 
-    # Convert the list to a pandas DataFrame
+    # Convert the list to a DataFrame and save it as a CSV
     data_df = pd.DataFrame(data)
-
-    # Save the DataFrame to a CSV file
     csv_path = output_folder / "data.csv"
     data_df.to_csv(csv_path, index=False)
     print(f"Data saved to CSV at: {csv_path}")
 
-# Define default transformations for the dataset
-def get_default_transforms():
+
+def get_default_transforms() -> transforms.Compose:
     """Return default transformations for the dataset."""
-    return transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
+    return transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
+
 
 if __name__ == "__main__":
     typer.run(preprocess)
