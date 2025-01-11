@@ -144,7 +144,11 @@ def train(
     print("Training complete")
 
     # Save the model
-    torch.save(model.state_dict(), "models/model.pth")
+    # Save the model
+    model_save_path = f"models/{model_name}.pth"
+    torch.save(model.state_dict(), model_save_path)
+    print(f"Model saved to {model_save_path}")
+
 
     # TODO: Make a seperate plotting function
     # Plot training statistics
