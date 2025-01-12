@@ -97,6 +97,11 @@ def build_docs(ctx: Context) -> None:
     """Build documentation."""
     ctx.run("mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS)
 
+@task # Run with: invoke git --message "My commit message"
+def git(ctx, message):
+    ctx.run(f"git add .")
+    ctx.run(f"git commit -m '{message}'")
+    ctx.run(f"git push")
 
 @task(dev_requirements)
 def serve_docs(ctx: Context) -> None:
