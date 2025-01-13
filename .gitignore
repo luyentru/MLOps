@@ -10,6 +10,7 @@
 # Ignore pretrained models
 models/
 reports/figures/
+reports/logs/
 
 docs/site/
 

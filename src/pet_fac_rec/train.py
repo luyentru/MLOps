@@ -1,16 +1,30 @@
+import logging
+from typing import List, Optional
+import random
+from datetime import datetime
+
+from hydra import compose, initialize
+from omegaconf import DictConfig, OmegaConf
 import matplotlib.pyplot as plt
 import torch
 import typer
-import random
 import numpy as np
 from pathlib import Path
 from torch.utils.data import DataLoader
-from torchvision import transforms
 from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
 from pet_fac_rec.data import MyDataset, get_default_transforms
 from tqdm import tqdm
 
 app = typer.Typer()
+
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
+log = logging.getLogger(__name__)
+
+
+def my_compose(overrides: Optional[List[str]]) -> DictConfig:
+    with initialize(config_path="configs", job_name="train_model"):
+        return compose(config_name="config.yaml", overrides=overrides)
 
 
 def set_seed(seed_value=42):
@@ -40,12 +54,12 @@ def get_model(model_name: str, num_classes: int) -> torch.nn.Module:
 @app.command()
 def train(
     model_name: str = typer.Option("efficientnet", help="Model type to use ('efficientnet', 'resnet50', 'vgg16')"),
-    lr: float = 1e-3,
-    batch_size: int = 8,
-    epochs: int = 2,
-    data_csv: Path = Path("data/data.csv"),
-    seed: int = 42,
+    overrides: Optional[List[str]] = typer.Argument(None),
 ) -> None:
+    cfg = my_compose(overrides)
+    print(f"Configuration: {OmegaConf.to_yaml(cfg)}") # Remove later
+    log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
+    hparams = cfg.experiment
     """
     Train the MyEfficientNetModel on the custom dataset.
 
@@ -57,23 +71,20 @@ def train(
         num_classes (int): Number of output classes in the dataset.
     """
     # Set the seed for reproducibility
-    set_seed(seed)
+    set_seed(hparams.seed)
 
     # Determine the device to use for training
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     )
-    print(f"Running on dev: {device}")
-
-    print("Training parameters:")
-    print(f"{lr=}, {batch_size=}, {epochs=}, {data_csv=}")
+    print(f"Running on dev: {device}") # Remove later
 
     # Load the dataset
     transform = get_default_transforms()
-    train_dataset = MyDataset(csv_file=data_csv, split="train", transform=transform)
-    valid_dataset = MyDataset(csv_file=data_csv, split="valid", transform=transform)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_dataloader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True)
+    train_dataset = MyDataset(csv_file=Path(hparams.data_csv), split="train", transform=transform)
+    valid_dataset = MyDataset(csv_file=Path(hparams.data_csv), split="valid", transform=transform)
+    train_dataloader = DataLoader(train_dataset, batch_size=hparams.batch_size, shuffle=True)
+    val_dataloader = DataLoader(valid_dataset, batch_size=hparams.batch_size, shuffle=True)
 
     # Initialize the model
     num_classes = train_dataset.num_classes
@@ -81,7 +92,7 @@ def train(
 
     # Define loss function and optimizer
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=hparams.lr)
 
     train_losses = []
     train_accuracies = []
@@ -90,7 +101,8 @@ def train(
     val_accuracies = []
 
     # Training loop
-    epoch_bar = tqdm(range(epochs))
+    log.info(f"Start training {model_name}...")
+    epoch_bar = tqdm(range(hparams.epochs))
     for epoch in epoch_bar:
         model.train()
         train_loss = 0.0
@@ -137,18 +149,16 @@ def train(
 
         val_losses.append(val_loss / total_samples)
         val_accuracies.append(total_correct / total_samples)
-        epoch_bar.set_description(
-            f"Epoch {epoch + 1}/{epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
-        )
+        status = f"Epoch {epoch + 1}/{hparams.epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
+        epoch_bar.set_description(status)
+        log.info(status)
 
-    print("Training complete")
+    log.info("Training complete")
 
-    # Save the model
     # Save the model
     model_save_path = f"models/{model_name}.pth"
     torch.save(model.state_dict(), model_save_path)
-    print(f"Model saved to {model_save_path}")
-
+    log.info(f"Model saved to {model_save_path}")
 
     # TODO: Make a seperate plotting function
     # Plot training statistics
