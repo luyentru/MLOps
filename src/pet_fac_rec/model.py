@@ -2,71 +2,49 @@ from typing import Tuple
 
 import torch
 from torch import nn
-from torchvision.models import EfficientNet_B5_Weights, efficientnet_b5
+from torchvision.models import efficientnet_b5, resnet50, vgg16
 
 
 class MyEfficientNetModel(nn.Module):
     """
     A model leveraging EfficientNet as the base feature extractor.
-
-    Attributes:
-        base_model (nn.Module): Pretrained EfficientNet model.
-        fc_layers (nn.Sequential): Fully connected layers for classification.
     """
 
     def __init__(self, num_classes: int, pretrained: bool = True) -> None:
-        """
-        Initialize the model with EfficientNet as the backbone.
-
-        Args:
-            num_classes (int): Number of output classes for classification.
-            pretrained (bool): Whether to use a pretrained EfficientNet model.
-        """
         super().__init__()
-
-        # Load EfficientNet as the base model with updated weights argument
-        weights = EfficientNet_B5_Weights.IMAGENET1K_V1 if pretrained else None
-        self.base_model = efficientnet_b5(weights=weights)
-
-        # Remove the final classification layer
-        self.base_model.classifier = nn.Identity()
-
-        # Define additional classification layers
-        self.fc_layers = nn.Sequential(
-            nn.BatchNorm1d(2048),
-            nn.Linear(2048, 256),
-            nn.ReLU(),
-            nn.Dropout(0.45),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, num_classes),
-        )
+        self.base_model = efficientnet_b5(pretrained=pretrained)
+        num_features = self.base_model.classifier[1].in_features
+        self.base_model.classifier = nn.Sequential(nn.Linear(num_features, num_classes))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass of the model.
-
-        Args:
-            x (torch.Tensor): Input tensor of shape (batch_size, channels, height, width).
-
-        Returns:
-            torch.Tensor: Output logits of shape (batch_size, num_classes).
-        """
-        x = self.base_model(x)
-        x = self.fc_layers(x)
-        return x
+        return self.base_model(x)
 
 
-if __name__ == "__main__":
-    # Example usage
-    num_classes = 10  # Replace with the actual number of classes
-    model = MyEfficientNetModel(num_classes=num_classes)
+class MyResNet50Model(nn.Module):
+    """
+    A model leveraging ResNet50 as the base feature extractor.
+    """
 
-    # Print model architecture and parameter count
-    print(f"Model architecture: {model}")
-    print(f"Number of parameters: {sum(p.numel() for p in model.parameters())}")
+    def __init__(self, num_classes: int, pretrained: bool = True) -> None:
+        super().__init__()
+        self.base_model = resnet50(pretrained=pretrained)
+        num_features = self.base_model.fc.in_features
+        self.base_model.fc = nn.Linear(num_features, num_classes)
 
-    # Test the model with a dummy input
-    dummy_input = torch.randn(1, 3, 224, 224)  # EfficientNet requires 3-channel 224x224 input
-    output = model(dummy_input)
-    print(f"Output shape: {output.shape}")
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.base_model(x)
+
+
+class MyVGG16Model(nn.Module):
+    """
+    A model leveraging VGG16 as the base feature extractor.
+    """
+
+    def __init__(self, num_classes: int, pretrained: bool = True) -> None:
+        super().__init__()
+        self.base_model = vgg16(pretrained=pretrained)
+        num_features = self.base_model.classifier[6].in_features
+        self.base_model.classifier[6] = nn.Linear(num_features, num_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.base_model(x)

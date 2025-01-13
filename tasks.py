@@ -56,10 +56,36 @@ def preprocess(ctx: Context) -> None:
 
 
 @task
-def train(ctx: Context) -> None:
+def trainEffNet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
 
+
+@task
+def trainResnet(ctx: Context) -> None:
+    """Train model."""
+    ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name resnet50", echo=True, pty=not WINDOWS)
+
+
+@task
+def trainVgg(ctx: Context) -> None:
+    """Train model."""
+    ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name vgg16", echo=True, pty=not WINDOWS)
+
+@task
+def evaluateEffNet(ctx: Context) -> None:
+    """Evaluate model."""
+    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth", echo=True, pty=not WINDOWS)
+
+@task
+def evaluateResnet(ctx: Context) -> None:
+    """Evaluate model."""
+    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth", echo=True, pty=not WINDOWS)
+
+@task
+def evaluateVgg(ctx: Context) -> None:
+    """Evaluate model."""
+    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth", echo=True, pty=not WINDOWS)
 
 @task
 def test(ctx: Context) -> None:
@@ -87,6 +113,11 @@ def build_docs(ctx: Context) -> None:
     """Build documentation."""
     ctx.run("mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS)
 
+@task # Run with: invoke git --message "My commit message"
+def git(ctx, message):
+    ctx.run(f"git add .")
+    ctx.run(f"git commit -m '{message}'")
+    ctx.run(f"git push")
 
 @task(dev_requirements)
 def serve_docs(ctx: Context) -> None:
