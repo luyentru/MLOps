@@ -117,6 +117,7 @@ def get_default_transforms() -> transforms.Compose:
         ]
     )
 
+
 def main():
     typer.run(preprocess)
 
