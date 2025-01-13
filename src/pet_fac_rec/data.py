@@ -10,7 +10,6 @@ from torchvision import transforms
 from PIL import Image
 import torch
 
-
 class MyDataset(Dataset):
     """Custom dataset for processing images and labels from a CSV file."""
 
@@ -54,7 +53,6 @@ class MyDataset(Dataset):
 
         return image, label
 
-
 def preprocess(output_folder: Path) -> None:
     """
     Preprocess the raw data and save it to the output folder.
@@ -65,21 +63,39 @@ def preprocess(output_folder: Path) -> None:
     # Ensure the output folder exists
     output_folder.mkdir(parents=True, exist_ok=True)
 
-    # Download dataset if not already present
-    if not any(output_folder.iterdir()):
-        print("Downloading dataset...")
-        download_path = Path(kh.dataset_download("anshtanwar/pets-facial-expression-dataset"))
-        print("Path to dataset files:", download_path)
+    # Check if the dataset has already been moved
+    if any((output_folder / split).exists() for split in ["train", "valid", "test"]):
+        print("Dataset already exists. Skipping download.")
+        return
 
-        master_folder_path = download_path / "Master Folder"
+    print("Downloading dataset...")
+    download_path = Path(kh.dataset_download("anshtanwar/pets-facial-expression-dataset"))
+    print(f"Dataset downloaded to: {download_path}")
 
-        if master_folder_path.exists():
-            # Move each file/subfolder in the Master_folder to the output directory
-            for item in master_folder_path.iterdir():
-                shutil.move(str(item), str(output_folder))
-            print(f"Contents of 'Master Folder' moved to: {output_folder}")
-        else:
-            print("Master Folder not found in the dataset.")
+    if not download_path.exists():
+        print("Error: Download path does not exist. Dataset download failed.")
+        return
+
+    # Check the contents of the downloaded path
+    print(f"Contents of the downloaded dataset: {[item.name for item in download_path.iterdir()]}")
+
+    master_folder_path = download_path / "Master Folder"
+
+    if master_folder_path.exists():
+        print(f"Contents of 'Master Folder': {[item.name for item in master_folder_path.iterdir()]}")
+
+        # Move the subdirectories (train, valid, test) from "Master Folder" to the output folder
+        for subfolder in ["train", "valid", "test"]:
+            source = master_folder_path / subfolder
+            destination = output_folder / subfolder
+            if source.exists():
+                shutil.move(str(source), str(destination))
+                print(f"Moved '{subfolder}' to {output_folder}")
+            else:
+                print(f"Warning: '{subfolder}' not found in 'Master Folder'.")
+    else:
+        print("Error: 'Master Folder' not found in the downloaded dataset.")
+        return
 
     # Walk through each subdirectory and file to create a data list
     data = []
@@ -87,6 +103,9 @@ def preprocess(output_folder: Path) -> None:
 
     for split in ["train", "valid", "test"]:
         split_path = output_folder / split
+        if not split_path.exists():
+            print(f"Warning: Split folder '{split}' not found in {output_folder}")
+            continue
         for label_dir in split_path.iterdir():
             if label_dir.is_dir():
                 for file in label_dir.iterdir():
@@ -106,7 +125,7 @@ def preprocess(output_folder: Path) -> None:
     data_df.to_csv(csv_path, index=False)
     print(f"Data saved to CSV at: {csv_path}")
 
-
+          
 def get_default_transforms() -> transforms.Compose:
     """Return default transformations for the dataset."""
     return transforms.Compose(
