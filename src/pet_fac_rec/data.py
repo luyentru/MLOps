@@ -1,4 +1,5 @@
 from pathlib import Path
+import logging
 import os
 import pandas as pd
 import kagglehub as kh
@@ -9,6 +10,10 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
 import torch
+
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
+log = logging.getLogger(__name__)
 
 class MyDataset(Dataset):
     """Custom dataset for processing images and labels from a CSV file."""
@@ -65,24 +70,24 @@ def preprocess(output_folder: Path) -> None:
 
     # Check if the dataset has already been moved
     if any((output_folder / split).exists() for split in ["train", "valid", "test"]):
-        print("Dataset already exists. Skipping download.")
+        log.info("Dataset already exists. Skipping download.")
         return
 
-    print("Downloading dataset...")
+    log.info("Downloading dataset...")
     download_path = Path(kh.dataset_download("anshtanwar/pets-facial-expression-dataset"))
-    print(f"Dataset downloaded to: {download_path}")
+    log.info(f"Dataset downloaded to: {download_path}")
 
     if not download_path.exists():
-        print("Error: Download path does not exist. Dataset download failed.")
+        log.info("Error: Download path does not exist. Dataset download failed.")
         return
-
+      
     # Check the contents of the downloaded path
-    print(f"Contents of the downloaded dataset: {[item.name for item in download_path.iterdir()]}")
+    log.info(f"Contents of the downloaded dataset: {[item.name for item in download_path.iterdir()]}")
 
     master_folder_path = download_path / "Master Folder"
 
     if master_folder_path.exists():
-        print(f"Contents of 'Master Folder': {[item.name for item in master_folder_path.iterdir()]}")
+        log.info(f"Contents of 'Master Folder': {[item.name for item in master_folder_path.iterdir()]}")
 
         # Move the subdirectories (train, valid, test) from "Master Folder" to the output folder
         for subfolder in ["train", "valid", "test"]:
@@ -90,11 +95,11 @@ def preprocess(output_folder: Path) -> None:
             destination = output_folder / subfolder
             if source.exists():
                 shutil.move(str(source), str(destination))
-                print(f"Moved '{subfolder}' to {output_folder}")
+                log.info(f"Moved '{subfolder}' to {output_folder}")
             else:
-                print(f"Warning: '{subfolder}' not found in 'Master Folder'.")
+                log.info(f"Warning: '{subfolder}' not found in 'Master Folder'.")
     else:
-        print("Error: 'Master Folder' not found in the downloaded dataset.")
+        log.info("Error: 'Master Folder' not found in the downloaded dataset.")
         return
 
     # Walk through each subdirectory and file to create a data list
@@ -123,7 +128,7 @@ def preprocess(output_folder: Path) -> None:
     data_df = pd.DataFrame(data)
     csv_path = output_folder / "data.csv"
     data_df.to_csv(csv_path, index=False)
-    print(f"Data saved to CSV at: {csv_path}")
+    log.info(f"Data saved to CSV at: {csv_path}")
 
           
 def get_default_transforms() -> transforms.Compose:
@@ -135,6 +140,7 @@ def get_default_transforms() -> transforms.Compose:
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
+
 
 def main():
     typer.run(preprocess)

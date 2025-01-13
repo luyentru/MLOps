@@ -72,20 +72,36 @@ def trainVgg(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name vgg16", echo=True, pty=not WINDOWS)
 
+
 @task
 def evaluateEffNet(ctx: Context) -> None:
     """Evaluate model."""
-    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth", echo=True, pty=not WINDOWS)
+    ctx.run(
+        f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth",
+        echo=True,
+        pty=not WINDOWS,
+    )
+
 
 @task
 def evaluateResnet(ctx: Context) -> None:
     """Evaluate model."""
-    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth", echo=True, pty=not WINDOWS)
+    ctx.run(
+        f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth",
+        echo=True,
+        pty=not WINDOWS,
+    )
+
 
 @task
 def evaluateVgg(ctx: Context) -> None:
     """Evaluate model."""
-    ctx.run(f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth", echo=True, pty=not WINDOWS)
+    ctx.run(
+        f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth",
+        echo=True,
+        pty=not WINDOWS,
+    )
+
 
 @task
 def test(ctx: Context) -> None:
