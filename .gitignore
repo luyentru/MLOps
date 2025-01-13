@@ -1,7 +1,23 @@
+# Ignore all .pt files
+*.pt
+
+# Ignore all .pth files
+*.pth
+
+# Ignore all .png files
+*.png
+
+# Ignore pretrained models
+models/
+reports/figures/
+
 docs/site/
 
 # data files
-data/processed/
+data/
+
+# notebook files
+*.ipynb
 
 # test cache
 manual_test/
