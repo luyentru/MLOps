@@ -1,10 +1,12 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import torch
 import typer
-from pathlib import Path
+from model import MyEfficientNetModel
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from model import MyEfficientNetModel
+
 from data import MyDataset, get_default_transforms
 
 # Determine the device to use for training

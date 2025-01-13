@@ -1,14 +1,15 @@
-from pathlib import Path
 import os
-import pandas as pd
-import kagglehub as kh
 import shutil
+from pathlib import Path
 from typing import Optional, Tuple
+
+import kagglehub as kh
+import pandas as pd
+import torch
 import typer
+from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-from PIL import Image
-import torch
 
 
 class MyDataset(Dataset):
@@ -61,6 +62,7 @@ def preprocess(output_folder: Path) -> None:
 
     # Ensure the output folder exists
     output_folder.mkdir(parents=True, exist_ok=True)
+    print("Output folder:", output_folder)
 
     # Download dataset if not already present
     if not any(output_folder.iterdir()):

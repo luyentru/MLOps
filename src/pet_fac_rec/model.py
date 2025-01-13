@@ -1,7 +1,8 @@
+from typing import Tuple
+
 import torch
 from torch import nn
-from torchvision.models import efficientnet_b5, EfficientNet_B5_Weights
-from typing import Tuple
+from torchvision.models import EfficientNet_B5_Weights, efficientnet_b5
 
 
 class MyEfficientNetModel(nn.Module):
