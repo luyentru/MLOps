@@ -57,7 +57,7 @@ def train(
     overrides: Optional[List[str]] = typer.Argument(None),
 ) -> None:
     cfg = my_compose(overrides)
-    print(f"Configuration: {OmegaConf.to_yaml(cfg)}")
+    print(f"Configuration: {OmegaConf.to_yaml(cfg)}") # Remove later
     log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
     hparams = cfg.experiment
     """
@@ -77,7 +77,7 @@ def train(
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     )
-    print(f"Running on dev: {device}")
+    print(f"Running on dev: {device}") # Remove later
 
     # Load the dataset
     transform = get_default_transforms()

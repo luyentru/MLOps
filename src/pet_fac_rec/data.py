@@ -1,4 +1,5 @@
 from pathlib import Path
+import logging
 import os
 import pandas as pd
 import kagglehub as kh
@@ -9,6 +10,10 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
 import torch
+
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
+log = logging.getLogger(__name__)
 
 
 class MyDataset(Dataset):
@@ -67,9 +72,9 @@ def preprocess(output_folder: Path) -> None:
 
     # Download dataset if not already present
     if not any(output_folder.iterdir()):
-        print("Downloading dataset...")
+        log.info("Downloading dataset...")
         download_path = Path(kh.dataset_download("anshtanwar/pets-facial-expression-dataset"))
-        print("Path to dataset files:", download_path)
+        log.info("Path to dataset files:", download_path)
 
         master_folder_path = download_path / "Master Folder"
 
@@ -77,9 +82,9 @@ def preprocess(output_folder: Path) -> None:
             # Move each file/subfolder in the Master_folder to the output directory
             for item in master_folder_path.iterdir():
                 shutil.move(str(item), str(output_folder))
-            print(f"Contents of 'Master Folder' moved to: {output_folder}")
+            log.info(f"Contents of 'Master Folder' moved to: {output_folder}")
         else:
-            print("Master Folder not found in the dataset.")
+            log.info("Master Folder not found in the dataset.")
 
     # Walk through each subdirectory and file to create a data list
     data = []
@@ -104,7 +109,7 @@ def preprocess(output_folder: Path) -> None:
     data_df = pd.DataFrame(data)
     csv_path = output_folder / "data.csv"
     data_df.to_csv(csv_path, index=False)
-    print(f"Data saved to CSV at: {csv_path}")
+    log.info(f"Data saved to CSV at: {csv_path}")
 
 
 def get_default_transforms() -> transforms.Compose:
