@@ -11,6 +11,7 @@ RUN apt-get update && \
 COPY requirements.txt pyproject.toml README.md ./
 COPY src/ src/
 COPY data/ data/
+COPY reports/ reports/
 
 # Set work directory
 WORKDIR /
