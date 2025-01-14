@@ -3,7 +3,7 @@ import typer
 from pathlib import Path
 import logging
 from datetime import datetime
-from pytorch_lightning import Trainer, LightningModule
+from pytorch_lightning import Trainer
 from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
 from pet_fac_rec.data import MyDataset, get_default_transforms
 

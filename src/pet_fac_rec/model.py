@@ -3,6 +3,7 @@ from torch import nn
 from torchvision.models import efficientnet_b5, resnet50, vgg16
 from pytorch_lightning import LightningModule
 
+
 class MyEfficientNetModel(LightningModule):
     """
     A LightningModule leveraging EfficientNet as the base feature extractor.
@@ -33,7 +34,7 @@ class MyEfficientNetModel(LightningModule):
         acc = (logits.argmax(dim=1) == y).float().mean()
         self.log("val_loss", loss, prog_bar=True)
         self.log("val_acc", acc, prog_bar=True)
-    
+
     def test_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
@@ -41,7 +42,6 @@ class MyEfficientNetModel(LightningModule):
         acc = (logits.argmax(dim=1) == y).float().mean()
         self.log("test_loss", loss, prog_bar=True)
         self.log("test_acc", acc, prog_bar=True)
-
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
