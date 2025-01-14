@@ -1,5 +1,6 @@
 # Ignore profiler logs
 profiler/
+lightning_logs/
 
 # Ignore all .pt files
 *.pt
