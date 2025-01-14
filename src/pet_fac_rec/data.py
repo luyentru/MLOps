@@ -9,6 +9,7 @@ import typer
 from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
+from datetime import datetime
 import torch
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
