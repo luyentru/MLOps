@@ -20,7 +20,7 @@ dynamic = ["dependencies", "optional-dependencies"]
 
 [project.scripts]
 train = "pet_fac_rec.train:app"
-evaluate = "pet_fac_rec.evaluate:main"
+evaluate = "pet_fac_rec.evaluate:app"
 preprocess = "pet_fac_rec.data:main"
 
 [tool.setuptools.dynamic]
