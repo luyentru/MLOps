@@ -1,3 +1,6 @@
+# Ignore wandb outputs
+wandb
+
 # Ignore profiler logs
 profiler/
 
