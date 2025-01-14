@@ -1,3 +1,6 @@
+# Ignore profiler logs
+profiler/
+
 # Ignore all .pt files
 *.pt
 

@@ -7,6 +7,7 @@ from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 import matplotlib.pyplot as plt
 import torch
+from torch.profiler import profile, record_function
 import typer
 import numpy as np
 from pathlib import Path
@@ -104,54 +105,62 @@ def train(
     log.info(f"Start training {model_name}...")
     epoch_bar = tqdm(range(hparams.epochs))
     for epoch in epoch_bar:
-        model.train()
-        train_loss = 0.0
-        total_correct = 0
-        total_samples = 0
+        with torch.profiler.profile(
+            schedule=torch.profiler.schedule(wait=2, warmup=2, active=6, repeat=1),
+            on_trace_ready=torch.profiler.tensorboard_trace_handler("profiler"),
+            with_stack=True,
+        ) as profiler:
+            model.train()
+            train_loss = 0.0
+            total_correct = 0
+            total_samples = 0
 
-        for img, target in iter(train_dataloader):
-            img, target = img.to(device), target.to(device)
-
-            # Forward pass
-            y_pred = model(img)
-            loss = criterion(y_pred, target)
-
-            # Backward pass and optimization
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            train_loss += loss.item() * img.size(0)
-            _, preds = torch.max(y_pred, 1)
-            total_correct += (preds == target).sum().item()
-            total_samples += target.size(0)
-
-        train_losses.append(train_loss / total_samples)
-        train_accuracies.append(total_correct / total_samples)
-
-        val_loss = 0.0
-        total_correct = 0
-        total_samples = 0
-
-        model.eval()
-
-        with torch.no_grad():
-            for img, target in iter(val_dataloader):
+            for img, target in iter(train_dataloader):
                 img, target = img.to(device), target.to(device)
 
-                outputs = model(img)
-                loss = criterion(outputs, target)
+                # Forward pass
+                y_pred = model(img)
+                with record_function("model_loss"):
+                    loss = criterion(y_pred, target)
 
-                val_loss += loss.item() * img.size(0)
-                _, preds = torch.max(outputs, 1)
+                # Backward pass and optimization
+                optimizer.zero_grad()
+                with record_function("backward"):
+                    loss.backward()
+                    optimizer.step()
+                profiler.step()
+
+                train_loss += loss.item() * img.size(0)
+                _, preds = torch.max(y_pred, 1)
                 total_correct += (preds == target).sum().item()
                 total_samples += target.size(0)
 
-        val_losses.append(val_loss / total_samples)
-        val_accuracies.append(total_correct / total_samples)
-        status = f"Epoch {epoch + 1}/{hparams.epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
-        epoch_bar.set_description(status)
-        log.info(status)
+            train_losses.append(train_loss / total_samples)
+            train_accuracies.append(total_correct / total_samples)
+
+            val_loss = 0.0
+            total_correct = 0
+            total_samples = 0
+
+            model.eval()
+
+            with torch.no_grad():
+                for img, target in iter(val_dataloader):
+                    img, target = img.to(device), target.to(device)
+
+                    outputs = model(img)
+                    loss = criterion(outputs, target)
+
+                    val_loss += loss.item() * img.size(0)
+                    _, preds = torch.max(outputs, 1)
+                    total_correct += (preds == target).sum().item()
+                    total_samples += target.size(0)
+
+            val_losses.append(val_loss / total_samples)
+            val_accuracies.append(total_correct / total_samples)
+            status = f"Epoch {epoch + 1}/{hparams.epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
+            epoch_bar.set_description(status)
+            log.info(status)
 
     log.info("Training complete")
 
