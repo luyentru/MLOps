@@ -77,7 +77,7 @@ def trainVgg(ctx: Context) -> None:
 def evaluateEffNet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
-        f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth",
+        f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.ckpt",
         echo=True,
         pty=not WINDOWS,
     )
@@ -87,7 +87,7 @@ def evaluateEffNet(ctx: Context) -> None:
 def evaluateResnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
-        f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth",
+        f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.ckpt",
         echo=True,
         pty=not WINDOWS,
     )
@@ -97,7 +97,7 @@ def evaluateResnet(ctx: Context) -> None:
 def evaluateVgg(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
-        f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth",
+        f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.ckpt",
         echo=True,
         pty=not WINDOWS,
     )
