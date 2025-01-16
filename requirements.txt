@@ -49,3 +49,6 @@ tzdata==2024.2
 urllib3==2.3.0
 uvicorn==0.34.0
 wandb==0.19.3
+pytest==8.3.4
+coverage==7.6.10
+pre-commit=4.0.1
