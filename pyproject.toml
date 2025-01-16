@@ -34,3 +34,14 @@ line-length = 120
 
 [tool.coverage.run]
 omit = ["tests/*"]
+
+[MASTER]
+ignore=CVS
+persistent=yes
+load-plugins=
+
+[MESSAGES CONTROL]
+disable=C0111
+
+[FORMAT]
+max-line-length=120
