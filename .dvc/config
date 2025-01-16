@@ -3,3 +3,4 @@
 ['remote "remote_storage"']
     url = gs://pet-fac-rec-bucket/
     version_aware = true
+    credentialpath = ../key.json
