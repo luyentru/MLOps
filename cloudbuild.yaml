@@ -25,5 +25,5 @@ options:
   logging: CLOUD_LOGGING_ONLY
   env:
     - DOCKER_BUILDKIT=1
-  subsitutions:
-    _IMAGE_NAME: 'train'
+substitutions:
+  _IMAGE_NAME: 'train'
