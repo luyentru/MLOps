@@ -86,7 +86,7 @@ def train(
     )
     print(f"Running on dev: {device}") # Remove later
 
-    wandb.init(
+    run = wandb.init(
         project="pet_fac_rec",
         entity="luyentrungkien00-danmarks-tekniske-universitet-dtu",
         job_type="train",
@@ -185,12 +185,25 @@ def train(
             )
 
     log.info("Training complete")
-    wandb.finish()
 
     # Save the model
     model_save_path = f"models/{model_name}.pth"
     torch.save(model.state_dict(), model_save_path)
     log.info(f"Model saved to {model_save_path}")
+    artifact = wandb.Artifact(
+        name="pet_fac_rec_model",
+        type="model",
+        description="A model trained to classify facial expressions of animals",
+        metadata={
+            "train_loss": train_losses[-1],
+            "train_accuracy": train_accuracies[-1],
+            "valid_loss": val_losses[-1],
+            "valid_accuracy": val_accuracies[-1],
+        },
+    )
+    artifact.add_file(model_save_path)
+    run.log_artifact(artifact)
+    wandb.finish()
 
     # TODO: Make a seperate plotting function
     # Plot training statistics
