@@ -1,17 +1,19 @@
-# Change from latest to a specific version if your requirements.txt
+# Use a specific Python version as base
 FROM python:3.11-slim AS base
 
-RUN apt update && \
-    apt install --no-install-recommends -y build-essential gcc && \
-    apt clean && rm -rf /var/lib/apt/lists/*
+# Set the working directory in the container
+WORKDIR /MLOPS
 
-COPY src src/
-COPY requirements.txt requirements.txt
-COPY requirements_dev.txt requirements_dev.txt
-COPY README.md README.md
-COPY pyproject.toml pyproject.toml
+# Copy requirements.txt into the container
+COPY requirements.txt ./requirements.txt
 
-RUN pip install -r requirements.txt --no-cache-dir --verbose
-RUN pip install . --no-deps --no-cache-dir --verbose
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
 
-ENTRYPOINT ["uvicorn", "src/pet_fac_rec/api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copy the application code into the container
+COPY src ./src
+COPY models ./models
+COPY data ./data
+
+# Set the command to run the API
+CMD ["uvicorn", "src.pet_fac_rec.api:app", "--host", "0.0.0.0", "--port", "80"]
