@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 
 load_dotenv()
 WANDB_API_KEY = os.getenv("WANDB_API_KEY")
+# TODO: FIX HARDCODING STUFF
 
 
 def my_compose(overrides: Optional[List[str]]) -> DictConfig:
@@ -202,7 +203,12 @@ def train(
         },
     )
     artifact.add_file(model_save_path)
+    artifact.link(
+        target_path=f"luyentrungkien00-danmarks-tekniske-universitet-dtu-org/wandb-registry-model/pet-fac-rec-model",
+        aliases=["staging"],
+    )
     run.log_artifact(artifact)
+    artifact.save()
     wandb.finish()
 
     # TODO: Make a seperate plotting function
