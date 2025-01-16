@@ -106,6 +106,9 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# Secret keys:
+key.json 
+
 # Scrapy stuff:
 .scrapy
 
