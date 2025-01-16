@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - main
+      - development
+      - unit_tests
   pull_request:
     branches:
       - main
+      - development
 
 jobs:
   test:
