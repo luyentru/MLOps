@@ -16,6 +16,7 @@ current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
 
+
 class MyDataset(Dataset):
     """Custom dataset for processing images and labels from a CSV file."""
 
@@ -59,6 +60,7 @@ class MyDataset(Dataset):
 
         return image, label
 
+
 def preprocess(output_folder: Path) -> None:
     """
     Preprocess the raw data and save it to the output folder.
@@ -81,7 +83,7 @@ def preprocess(output_folder: Path) -> None:
     if not download_path.exists():
         log.info("Error: Download path does not exist. Dataset download failed.")
         return
-      
+
     # Check the contents of the downloaded path
     log.info(f"Contents of the downloaded dataset: {[item.name for item in download_path.iterdir()]}")
 
@@ -131,7 +133,7 @@ def preprocess(output_folder: Path) -> None:
     data_df.to_csv(csv_path, index=False)
     log.info(f"Data saved to CSV at: {csv_path}")
 
-          
+
 def get_default_transforms() -> transforms.Compose:
     """Return default transformations for the dataset."""
     return transforms.Compose(
