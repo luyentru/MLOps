@@ -64,10 +64,6 @@ def train(
     model_name: str = typer.Option("efficientnet", help="Model type to use ('efficientnet', 'resnet50', 'vgg16')"),
     overrides: Optional[List[str]] = typer.Argument(None),
 ) -> None:
-    cfg = my_compose(overrides)
-    print(f"Configuration: {OmegaConf.to_yaml(cfg)}")  # Remove later
-    log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
-    hparams = cfg.experiment
     """
     Train the MyEfficientNetModel on the custom dataset.
 
@@ -78,6 +74,11 @@ def train(
         data_csv (Path): Path to the CSV file containing the preprocessed data.
         num_classes (int): Number of output classes in the dataset.
     """
+    cfg = my_compose(overrides)
+    print(f"Configuration: {OmegaConf.to_yaml(cfg)}")  # Remove later
+    log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
+    hparams = cfg.experiment
+
     # Set the seed for reproducibility
     set_seed(hparams.seed)
 
@@ -203,11 +204,12 @@ def train(
         },
     )
     artifact.add_file(model_save_path)
-    artifact.link(
+    logged_art = run.log_artifact(artifact)
+    run.link_artifact(
+        artifact=logged_art,
         target_path=f"luyentrungkien00-danmarks-tekniske-universitet-dtu-org/wandb-registry-model/pet-fac-rec-model",
         aliases=["staging"],
     )
-    run.log_artifact(artifact)
     artifact.save()
     wandb.finish()
 
