@@ -22,11 +22,12 @@ def create_environment(ctx: Context) -> None:
         echo=True,
         pty=not WINDOWS,
     )
-    
+
+
 @task
 def delete_environment(ctx: Context) -> None:
     """Delete the conda environment for project."""
-    ctx.run(f"conda deactivate", echo=True, pty=not WINDOWS)
+    ctx.run("conda deactivate", echo=True, pty=not WINDOWS)
     ctx.run(f"conda remove --name {PROJECT_NAME} --all --yes", echo=True, pty=not WINDOWS)
 
 
@@ -215,12 +216,11 @@ def build_docs(ctx: Context) -> None:
     """Build documentation."""
     ctx.run("mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS)
 
-
-@task # Run with: invoke git --message "My commit message"
+@task  # Run with: invoke git --message "My commit message"
 def git(ctx, message):
-    ctx.run(f"git add .")
+    ctx.run("git add .")
     ctx.run(f"git commit -m '{message}'")
-    ctx.run(f"git push")
+    ctx.run("git push")
 
 
 @task(dev_requirements)
