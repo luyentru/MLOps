@@ -13,7 +13,7 @@ steps:
     '-t',
     'europe-west1-docker.pkg.dev/$PROJECT_ID/pet-fac-rec-image-storage/$_IMAGE_NAME',
     '-f',
-    'dockerfiles/train.dockerfile'
+    'dockerfiles/train_gcloud.dockerfile'
   ]
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Push container image'

@@ -136,41 +136,73 @@ def gcloud_build_image(ctx: Context) -> None:
 
 
 @task
-def gcloud_train(ctx, machine: str = "cpu", epochs: int = 10) -> None:
+def gcloud_queue(ctx, configname: str) -> None:
+    """
+    Queue config files for training in Vertex AI. Run before gcloud_train.
+
+    Args:
+        configname: Name of the config file.
+    """
+    ctx.run(f"mkdir -p vertex_train\\completed\\{configname}")
+    ctx.run(f"dvc add ./vertex_train", echo=True, pty=not WINDOWS)
+    ctx.run(f"dvc push ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
+    print("Data pushed to dvc remote.")
+    
+
+@task
+def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
     """
     Run a custom training job in Vertex AI using gcloud.
 
     Args:
+        configname: Name of the config file.
         machine: Machine type, such as "cpu" or "gpu".
     """
-    if machine == "gpu":
-        i = 1
-    elif machine == "cpu":
-        i = 4
-    else:
-        raise ValueError("Machine must be 'cpu' or 'gpu'.")
     
-    command = (
-        f"gcloud ai custom-jobs create "
-        f"--region=europe-west{i} "
-        f"--display-name=test-run "
-        f"--config=config_{machine}.yaml "
-        f"--command 'python' "
-        f"--args 'src/pet_fac_rec/train.py' "
-        f"--args '--epochs' "
-        f"--args '{epochs}' "
+    # Paths and variables
+    config_file = f"vertex_config/config_{machine}.yaml"
+    output_file = f"vertex_config/temp/{configname}_config_{machine}.yaml"
+    image_uri = "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train:latest"
+    storage_uri = "gs://pet-fac-rec-bucket"
+
+    # Create the yq command
+    yq_command = (
+        f"bash -c \"yq eval "
+        f"'.workerPoolSpecs.containerSpec.imageUri = \\\"{image_uri}\\\" | "
+        f".workerPoolSpecs.containerSpec.env[0].value = \\\"{storage_uri}\\\" | "
+        f".workerPoolSpecs.containerSpec.env[1].value = \\\"{configname}\\\"' "
+        f"{config_file} > {output_file}\""
     )
-    ctx.run(command, echo=True, pty=not WINDOWS)
+    
+    region = "europe-west4" if machine == "cpu" else "europe-west1"
+    gcloud_command = (
+        f"gcloud ai custom-jobs create "
+        f"--region={region} "
+        f"--display-name={configname}-run "
+        f"--config={output_file} "
+    )
+    
+    ctx.run(yq_command, echo=True, pty=False)
+    ctx.run(gcloud_command, echo=True, pty=False)
+    print("Training job submitted successfully.")
+    ctx.run(f"rm {output_file}", echo=True, pty=False)
+
+
+@task
+def gcloud_check(ctx: Context) -> None:
+    """Check the status of the Vertex AI jobs."""
+    ctx.run(f"dvc pull ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
 
     
 @task
 def gcloud_login(ctx: Context) -> None:
     """Login to gcloud."""
     ctx.run(f"gcloud auth application-default login", echo=True, pty=not WINDOWS)
+    ctx.run(f"gcloud config set project pet-fac-rec", echo=True, pty=not WINDOWS)
     
         
 @task
-def gcloud_dvc_push(ctx: Context) -> None:
+def gcloud_data_push(ctx: Context) -> None:
     """Push data to dvc remote."""
     ctx.run(f"dvc add ./data/")
     ctx.run(f"git add ./data.dvc")
@@ -183,11 +215,13 @@ def build_docs(ctx: Context) -> None:
     """Build documentation."""
     ctx.run("mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS)
 
+
 @task # Run with: invoke git --message "My commit message"
 def git(ctx, message):
     ctx.run(f"git add .")
     ctx.run(f"git commit -m '{message}'")
     ctx.run(f"git push")
+
 
 @task(dev_requirements)
 def serve_docs(ctx: Context) -> None:

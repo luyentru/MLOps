@@ -1,5 +1,0 @@
-lr: 0.001
-batch_size: 16
-epochs: 1
-data_csv: "data/data.csv"
-seed: 42

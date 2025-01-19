@@ -1,0 +1,18 @@
+outs:
+- hash: md5
+  path: vertex_train
+  files:
+  - relpath: queue/exp1.yaml
+    md5: 00239aa66a3e2da07bcadb8e09ba066a
+    size: 73
+    cloud:
+      remote_storage:
+        etag: 08efe3a0adc9fd8a031001
+        version_id: '1737144983368175'
+  - relpath: queue/exp2.yaml
+    md5: 03fee8a2c5f2f195fcc180ecf7a86d5a
+    size: 70
+    cloud:
+      remote_storage:
+        etag: 08b7bca8adc9fd8a031001
+        version_id: '1737144983494199'
