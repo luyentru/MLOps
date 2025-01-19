@@ -106,6 +106,9 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# Secret keys:
+key.json 
+
 # Scrapy stuff:
 .scrapy
 
@@ -199,3 +202,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+/data
