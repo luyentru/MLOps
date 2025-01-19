@@ -3,12 +3,8 @@ outs:
   path: data
   files:
   - relpath: data.csv
-    md5: 8f2ddd57f754eea18eaf6ac4129b9baa
-    size: 40582
-    cloud:
-      remote_storage:
-        etag: 08baeab1c7bbfa8a031001
-        version_id: '1737038200862010'
+    md5: 532f3048e31a28478f035488cdde1674
+    size: 39507
   - relpath: test/Angry/01.jpg
     md5: f429dfe0b79e84d11a6c9eed08a02785
     size: 28446
