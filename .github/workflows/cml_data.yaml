@@ -7,9 +7,15 @@ on:
     paths:
       - '**/data.dvc'
       - '.dvc/**'
+  push:
+    branches:
+      - gcloud
+    paths:
+      - '**/data.dvc'
+      - '.dvc/**'
 
 jobs:
-  run_data_checker:
+  dataset_statistics:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,3 +51,19 @@ jobs:
       - name: Check data statistics
         run: |
           python src/pet_fac_rec/data.dataset_statistics.py
+
+      - name: Check data statistics & generate report
+        run: |
+          python src/pet_fac_rec/data.dataset_statistics.py > data_statistics.md
+          echo '![](./pet_facial_expressions.png "Pet facial expressions")' >> data_statistics.md
+          echo '![](./train_label_distribution.png "Train label distribution")' >> data_statistics.md
+          echo '![](./test_label_distribution.png "Test label distribution")' >> data_statistics.md
+
+      - name: Setup cml
+        uses: iterative/setup-cml@v2
+
+      - name: Comment on PR
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cml comment create data_statistics.md --watermark-title="Data Checker" # (1)!

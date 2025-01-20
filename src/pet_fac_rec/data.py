@@ -163,7 +163,7 @@ def dataset_statistics(datadir: str = "data/data.csv") -> None:
     print(f"Image shape: {test_dataset[0][0].shape}")
 
     show_image_and_target(train_dataset.images[:25], train_dataset.target[:25], show=False)
-    plt.savefig("mnist_images.png")
+    plt.savefig("pet_facial_expressions.png")
     plt.close()
 
     train_label_distribution = torch.bincount(train_dataset.target)
