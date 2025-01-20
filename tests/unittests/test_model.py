@@ -6,7 +6,7 @@ from pet_fac_rec.model import MyEfficientNetModel
 def test_efficientnet_model_init():
     model = MyEfficientNetModel(num_classes=4)
     # Check if the final layer has correct output dimensions
-    assert model.base_model.classifier[0].out_features == 4, "EfficientNet does not create 10 output classes"
+    assert model.base_model.classifier[-1].out_features == 4, "EfficientNet does not create 4 output classes"
 
 
 def test_efficientnet_forward_pass():
@@ -16,7 +16,7 @@ def test_efficientnet_forward_pass():
     output = model(x)
 
     # Check output shape and type
-    assert output.shape == (1, 4), "EfficientNet does not create 10 output classes"
+    assert output.shape == (2, 4), "EfficientNet does not create 4 output classes"
     assert isinstance(output, torch.Tensor), "Model output is not a PyTorch tensor"
 
 
