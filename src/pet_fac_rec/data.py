@@ -9,6 +9,8 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
 from datetime import datetime
+from pet_fac_rec.preprocessing import get_transforms
+
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
@@ -32,7 +34,7 @@ class MyDataset(Dataset):
         self.data = self.data[self.data["split"] == split]
         self.labels = self.data["label"].unique()
         self.num_classes = len(self.labels)
-        self.transform = transform
+        self.transform = transform or get_transforms()
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
@@ -130,17 +132,6 @@ def preprocess(output_folder: Path) -> None:
     csv_path = output_folder / "data.csv"
     data_df.to_csv(csv_path, index=False)
     log.info(f"Data saved to CSV at: {csv_path}")
-
-
-def get_default_transforms() -> transforms.Compose:
-    """Return default transformations for the dataset."""
-    return transforms.Compose(
-        [
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
 
 
 def main():

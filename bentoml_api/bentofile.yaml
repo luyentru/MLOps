@@ -1,10 +1,9 @@
-service: src.service:svc
-include:
-  - src/**
-
+service: "src.service:svc"
+labels:
+  owner: mlops-team
+  project: pet-facial-recognition
 python:
   packages:
+    - torch
     - numpy
     - Pillow
-    - onnxruntime
-    - bentoml

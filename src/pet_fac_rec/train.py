@@ -13,7 +13,8 @@ import numpy as np
 from pathlib import Path
 from torch.utils.data import DataLoader
 from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
-from pet_fac_rec.data import MyDataset, get_default_transforms
+from pet_fac_rec.data import MyDataset
+from pet_fac_rec.preprocessing import get_transforms
 from tqdm import tqdm
 import onnx
 
@@ -82,7 +83,7 @@ def train(
     print(f"Running on dev: {device}")  # Remove later
 
     # Load the dataset
-    transform = get_default_transforms()
+    transform = get_transforms()
     train_dataset = MyDataset(csv_file=Path(hparams.data_csv), split="train", transform=transform)
     valid_dataset = MyDataset(csv_file=Path(hparams.data_csv), split="valid", transform=transform)
     train_dataloader = DataLoader(train_dataset, batch_size=hparams.batch_size, shuffle=True)
@@ -174,7 +175,7 @@ def train(
     try:
         model.eval()
         dummy_input = torch.randn(1, 3, 224, 224).to(device)
-        onnx_save_path = f"models/{model_name}_v2.onnx"
+        onnx_save_path = f"models/{model_name}.onnx"
 
         # Export the model
         torch.onnx.export(
