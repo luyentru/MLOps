@@ -275,7 +275,7 @@ We use pip-tools to maintain dependencies, making it easy to update packages whi
 
 > Answer:
 
---- question 5 fill here ---
+--- We used most of the directories and files from the cookiecutter template to structure our project. Initially, we used the data-folder for local data-storage, until we used the GCP bucket linked with the DVC for data management. We adapted the data-storage structure by removing the processed/raw-folders and replacing them with test/train/valid folders to store the data. Moreover, we removed the notebooks-folder as we did not use any Jupyter notebooks for our project. To store experiment configurations, we added a config-directory within the src-folder to separate the configuration files from the code. We also added sub-folders in the tests-directory to structure our tests into unittests, and integrationtests. Lastly, we added a requirements_tests.txt for the testing frameworks and tools. Therefore, we retained most aspects from the template but made small adjustments to fit the structure of our repository to the project's organization. ---
 
 ### Question 6
 
