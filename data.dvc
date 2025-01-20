@@ -12,13 +12,6 @@ outs:
   - relpath: test/Angry/01.jpg
     md5: f429dfe0b79e84d11a6c9eed08a02785
     size: 28446
-  - relpath: test/Angry/11.jpg
-    md5: bdd43151ae7c111cf459cd44f5ed8985
-    size: 11544
-    cloud:
-      remote_storage:
-        etag: 08acaeddc9bbfa8a031001
-        version_id: '1737038205769516'
   - relpath: test/Angry/14.jpg
     md5: fba0ef49b389af7559c998eccf23c2b0
     size: 21653
