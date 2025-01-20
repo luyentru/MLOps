@@ -17,6 +17,8 @@ from torch.utils.data import DataLoader
 from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
 from pet_fac_rec.data import MyDataset
 from pet_fac_rec.preprocessing import get_transforms
+from pet_fac_rec.visualize import plot_training_statistics
+from pet_fac_rec.data import MyDataset, get_default_transforms
 from tqdm import tqdm
 import onnx
 import wandb
@@ -225,18 +227,8 @@ def train(
     except Exception as e:
         log.error(f"Failed to export ONNX model: {str(e)}")
 
-    # TODO: Make a seperate plotting function
     # Plot training statistics
-    fig, axs = plt.subplots(2, 2, figsize=(15, 5))
-    axs[0][0].plot(train_losses)
-    axs[0][0].set_title("Train loss")
-    axs[0][1].plot(train_accuracies)
-    axs[0][1].set_title("Train accuracy")
-    axs[1][0].plot(val_losses)
-    axs[1][0].set_title("Validation loss")
-    axs[1][1].plot(val_accuracies)
-    axs[1][1].set_title("Validation accuracy")
-    fig.savefig("reports/figures/training_statistics.png")
+    plot_training_statistics(train_losses, train_accuracies, val_losses, val_accuracies)
 
 
 if __name__ == "__main__":
