@@ -27,7 +27,11 @@ log = logging.getLogger(__name__)
 
 load_dotenv()
 WANDB_API_KEY = os.getenv("WANDB_API_KEY")
-# TODO: FIX HARDCODING STUFF
+WANDB_PROJECT = os.getenv("WANDB_PROJECT")
+WANDB_ENTITY = os.getenv("WANDB_ENTITY")
+WANDB_ENTITY_ORG = os.getenv("WANDB_ENTITY_ORG")
+WANDB_REGISTRY = os.getenv("WANDB_REGISTRY")
+WANDB_COLLECTION = os.getenv("WANDB_COLLECTION")
 
 
 def my_compose(overrides: Optional[List[str]]) -> DictConfig:
@@ -64,16 +68,6 @@ def train(
     model_name: str = typer.Option("efficientnet", help="Model type to use ('efficientnet', 'resnet50', 'vgg16')"),
     overrides: Optional[List[str]] = typer.Argument(None),
 ) -> None:
-    """
-    Train the MyEfficientNetModel on the custom dataset.
-
-    Args:
-        lr (float): Learning rate for the optimizer.
-        batch_size (int): Batch size for training.
-        epochs (int): Number of epochs to train the model.
-        data_csv (Path): Path to the CSV file containing the preprocessed data.
-        num_classes (int): Number of output classes in the dataset.
-    """
     cfg = my_compose(overrides)
     print(f"Configuration: {OmegaConf.to_yaml(cfg)}")  # Remove later
     log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
@@ -89,8 +83,8 @@ def train(
     print(f"Running on dev: {device}")  # Remove later
 
     run = wandb.init(
-        project="pet_fac_rec",
-        entity="luyentrungkien00-danmarks-tekniske-universitet-dtu",
+        project=WANDB_PROJECT,
+        entity=WANDB_ENTITY,
         job_type="train",
         name=f"exp_{current_time}",
         config={"lr": hparams.lr, "batch_size": hparams.batch_size, "epochs": hparams.epochs},
@@ -207,7 +201,7 @@ def train(
     logged_art = run.log_artifact(artifact)
     run.link_artifact(
         artifact=logged_art,
-        target_path=f"luyentrungkien00-danmarks-tekniske-universitet-dtu-org/wandb-registry-model/pet-fac-rec-model",
+        target_path=f"{WANDB_ENTITY_ORG}/{WANDB_REGISTRY}/{WANDB_COLLECTION}",
         aliases=["staging"],
     )
     artifact.save()
