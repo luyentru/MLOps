@@ -10,11 +10,15 @@ from torchvision import transforms
 from PIL import Image
 from datetime import datetime
 from pet_fac_rec.preprocessing import get_transforms
-
+import os
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+os.makedirs("reports/logs", exist_ok=True)
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
+
+# define image classes
+label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
 
 class MyDataset(Dataset):
@@ -107,7 +111,6 @@ def preprocess(output_folder: Path) -> None:
 
     # Walk through each subdirectory and file to create a data list
     data = []
-    label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
     for split in ["train", "valid", "test"]:
         split_path = output_folder / split
