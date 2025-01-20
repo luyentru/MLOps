@@ -10,6 +10,3 @@ workerPoolSpecs:
           value: STORAGE_URI
         - name: CONFIG_NAME
           value: CONFIG_NAME
-        command: ["bash"]
-        args: ["-c", "chmod +x gcloud_container_command.sh && ./gcloud_container_command.sh"]
-

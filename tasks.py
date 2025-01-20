@@ -144,7 +144,12 @@ def gcloud_queue(ctx, configname: str) -> None:
     Args:
         configname: Name of the config file.
     """
-    ctx.run(f"mkdir -p vertex_train\\completed\\{configname}")
+    
+    # Create directory using os.makedirs
+    target_dir = os.path.join("vertex_train", "completed", configname)
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # DVC commands
     ctx.run(f"dvc add ./vertex_train", echo=True, pty=not WINDOWS)
     ctx.run(f"dvc push ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
     print("Data pushed to dvc remote.")
@@ -163,7 +168,7 @@ def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
     # Paths and variables
     config_file = f"vertex_config/config_{machine}.yaml"
     output_file = f"vertex_config/temp/{configname}_config_{machine}.yaml"
-    image_uri = "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train:latest"
+    image_uri = "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train_gpu:latest"
     storage_uri = "gs://pet-fac-rec-bucket"
 
     # Create the yq command
@@ -180,13 +185,15 @@ def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
         f"gcloud ai custom-jobs create "
         f"--region={region} "
         f"--display-name={configname}-run "
+        f"--enable-web-access "
+        f"--service-account=vertex-manager@pet-fac-rec.iam.gserviceaccount.com "
         f"--config={output_file} "
     )
     
     ctx.run(yq_command, echo=True, pty=False)
     ctx.run(gcloud_command, echo=True, pty=False)
-    print("Training job submitted successfully.")
     ctx.run(f"rm {output_file}", echo=True, pty=False)
+    print("Training job submitted successfully.")
 
 
 @task

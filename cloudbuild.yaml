@@ -26,4 +26,4 @@ options:
   env:
     - DOCKER_BUILDKIT=1
 substitutions:
-  _IMAGE_NAME: 'train'
+  _IMAGE_NAME: 'train_gpu'

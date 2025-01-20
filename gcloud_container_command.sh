@@ -21,13 +21,13 @@ mkdir -p /reports/figures
 mkdir -p /models
 
 # Copy config file
-gsutil cp "${STORAGE_URI}/vertex_train/queue/${CONFIG_NAME}.yaml" /src/pet_fac_rec/configs/experiment
+gsutil cp "${STORAGE_URI}/vertex_train/queue/${CONFIG_NAME}.yaml" /src/pet_fac_rec/configs/experiment/
 
 # Copy data
 gsutil -m cp -r "${STORAGE_URI}/data" /
 
 # Run training
-python3 -u src/pet_fac_rec/train.py experiment="${CONFIG_NAME}"
+python3.11 -u src/pet_fac_rec/train.py experiment="${CONFIG_NAME}"
 
 # Copy logs and models to completed folder
 gsutil cp -r /reports/logs "${STORAGE_URI}/vertex_train/completed/${CONFIG_NAME}/logs"
