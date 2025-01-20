@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS" > /home/runner/gcp-key.json
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BUCKET_DVC_MANAGER_KEY }}
 
       - name: Pull data
         run: |
