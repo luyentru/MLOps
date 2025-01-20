@@ -1,13 +1,18 @@
-from datetime import datetime
-from dotenv import load_dotenv
-import torch
-import typer
-from pathlib import Path
 import logging
 from datetime import datetime
-from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
-from pet_fac_rec.data import MyDataset, get_default_transforms
+from pathlib import Path
+
+import torch
+import typer
 import wandb
+from dotenv import load_dotenv
+
+from pet_fac_rec.data import MyDataset
+from pet_fac_rec.data import get_default_transforms
+from pet_fac_rec.model import MyEfficientNetModel
+from pet_fac_rec.model import MyResNet50Model
+from pet_fac_rec.model import MyVGG16Model
+
 
 app = typer.Typer()
 CURR_TIME = datetime.now().strftime("%Y-%m-%d_%H-%M-%Sa")

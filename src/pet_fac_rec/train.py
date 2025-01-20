@@ -1,27 +1,32 @@
 import logging
-from typing import List, Optional
+import os
 import random
 from datetime import datetime
-import os
-
-from dotenv import load_dotenv
-from hydra import compose, initialize
-from omegaconf import DictConfig, OmegaConf
-import matplotlib.pyplot as plt
-import torch
-from torch.profiler import record_function
-import typer
-import numpy as np
 from pathlib import Path
+from typing import List
+from typing import Optional
+
+import numpy as np
+import onnx
+import torch
+import typer
+import wandb
+from dotenv import load_dotenv
+from hydra import compose
+from hydra import initialize
+from omegaconf import DictConfig
+from omegaconf import OmegaConf
+from torch.profiler import record_function
 from torch.utils.data import DataLoader
-from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
+from tqdm import tqdm
+
 from pet_fac_rec.data import MyDataset
+from pet_fac_rec.model import MyEfficientNetModel
+from pet_fac_rec.model import MyResNet50Model
+from pet_fac_rec.model import MyVGG16Model
 from pet_fac_rec.preprocessing import get_transforms
 from pet_fac_rec.visualize import plot_training_statistics
-from pet_fac_rec.data import MyDataset, get_default_transforms
-from tqdm import tqdm
-import onnx
-import wandb
+
 
 app = typer.Typer()
 
@@ -176,7 +181,11 @@ def train(
 
             val_losses.append(val_loss / total_samples)
             val_accuracies.append(total_correct / total_samples)
-            status = f"Epoch {epoch + 1}/{hparams.epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
+            status = (
+                f"Epoch {epoch + 1}/{hparams.epochs} | "
+                f"Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | "
+                f"Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
+            )
             epoch_bar.set_description(status)
             log.info(status)
             wandb.log(
