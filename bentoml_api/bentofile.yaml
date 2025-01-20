@@ -1,0 +1,10 @@
+service: src.service:svc
+include:
+  - src/**
+
+python:
+  packages:
+    - numpy
+    - Pillow
+    - onnxruntime
+    - bentoml

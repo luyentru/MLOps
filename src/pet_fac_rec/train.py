@@ -15,6 +15,7 @@ from torch.utils.data import DataLoader
 from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
 from pet_fac_rec.data import MyDataset, get_default_transforms
 from tqdm import tqdm
+import onnx
 
 app = typer.Typer()
 
@@ -168,6 +169,37 @@ def train(
     model_save_path = f"models/{model_name}.pth"
     torch.save(model.state_dict(), model_save_path)
     log.info(f"Model saved to {model_save_path}")
+
+    # Export ONNX file
+    try:
+        model.eval()
+        dummy_input = torch.randn(1, 3, 224, 224).to(device)
+        onnx_save_path = f"models/{model_name}_v2.onnx"
+
+        # Export the model
+        torch.onnx.export(
+            model,
+            dummy_input,
+            onnx_save_path,
+            input_names=["input"],
+            output_names=["output"],
+            dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+            opset_version=11,  # Specify ONNX opset version
+            do_constant_folding=True,  # Optimize constant-folding
+            export_params=True,  # Store the trained parameter weights inside the model file
+        )
+
+        # Verify the model
+        onnx_model = onnx.load(onnx_save_path)
+        onnx.checker.check_model(onnx_model)
+
+        # Add model metadata
+        onnx_model.graph.doc_string = f"Pet facial recognition model using {model_name}"
+        onnx.save(onnx_model, onnx_save_path)
+
+        log.info(f"Model exported and verified to ONNX at {onnx_save_path}")
+    except Exception as e:
+        log.error(f"Failed to export ONNX model: {str(e)}")
 
     # TODO: Make a seperate plotting function
     # Plot training statistics
