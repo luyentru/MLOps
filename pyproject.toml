@@ -1,36 +1,44 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pet_fac_rec"
-version = "0.0.1"
-description = "A short description of the project."
-authors = [
-  { name = "MLOppers", email = "your@email.com" },
-]
-keywords = ["machine learning", "MLOps"]
-classifiers = [
-  "Development Status :: 3 - Alpha",
-  "Programming Language :: Python :: 3",
-]
-readme = "README.md"
+name = "MLOps"
+version = "0.1.0"
+description = "MLOps Project"
 requires-python = ">=3.11"
-dynamic = ["dependencies", "optional-dependencies"]
 
-[project.scripts]
-train = "pet_fac_rec.train:app"
-evaluate = "pet_fac_rec.evaluate:main"
-preprocess = "pet_fac_rec.data:main"
+[tool.pylint.MASTER]
+ignore = ["CVS"]
+persistent = true
+load-plugins = []
 
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+[tool.pylint.MESSAGES_CONTROL]
+disable = [
+    "C0111",  # missing-docstring
+    "C0103",  # invalid-name
+]
 
-[tool.setuptools.dynamic.optional-dependencies]
-dev = {file = ['requirements_dev.txt']}
+[tool.pylint.FORMAT]
+max-line-length = 120
 
 [tool.ruff]
 line-length = 120
+target-version = "py311"
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+]
+ignore = []
 
-[tool.coverage.run]
-omit = ["tests/*"]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.isort]
+force-single-line = true
+lines-after-imports = 2
