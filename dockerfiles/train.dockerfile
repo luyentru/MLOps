@@ -10,7 +10,7 @@ RUN apt-get update && \
 # Copy necessary files
 COPY requirements.txt pyproject.toml README.md ./
 COPY src/ src/
-COPY data/ data/
+# COPY data/ data/ # Removed due to causing problems with cloud build
 COPY reports/ reports/
 COPY .env ./
 

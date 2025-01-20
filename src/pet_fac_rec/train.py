@@ -9,7 +9,7 @@ from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 import matplotlib.pyplot as plt
 import torch
-from torch.profiler import profile, record_function
+from torch.profiler import record_function
 import typer
 import numpy as np
 from pathlib import Path
@@ -64,7 +64,7 @@ def train(
     overrides: Optional[List[str]] = typer.Argument(None),
 ) -> None:
     cfg = my_compose(overrides)
-    print(f"Configuration: {OmegaConf.to_yaml(cfg)}") # Remove later
+    print(f"Configuration: {OmegaConf.to_yaml(cfg)}")  # Remove later
     log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
     hparams = cfg.experiment
     """
@@ -84,7 +84,7 @@ def train(
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     )
-    print(f"Running on dev: {device}") # Remove later
+    print(f"Running on dev: {device}")  # Remove later
 
     wandb.init(
         project="pet_fac_rec",
