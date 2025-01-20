@@ -1,9 +1,9 @@
 import pytest
 from pathlib import Path
-from unittest.mock import patch
 import logging
-from pet_fac_rec.data import preprocess
-from . import _PATH_DATA, _PROJECT_ROOT, _TEST_ROOT
+import os
+import pandas as pd
+
 
 
 @pytest.fixture(autouse=True)

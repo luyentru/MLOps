@@ -1,7 +1,9 @@
 import os
 import sys
 
-from invoke import Context, task
+from invoke import Context
+from invoke import task
+
 
 WINDOWS = os.name == "nt"
 PROJECT_NAME = "pet_fac_rec"
@@ -27,7 +29,7 @@ def create_environment(ctx: Context) -> None:
 @task
 def delete_environment(ctx: Context) -> None:
     """Delete the conda environment for project."""
-    ctx.run(f"conda deactivate", echo=True, pty=not WINDOWS)
+    ctx.run("conda deactivate", echo=True, pty=not WINDOWS)
     ctx.run(f"conda remove --name {PROJECT_NAME} --all --yes", echo=True, pty=not WINDOWS)
 
 
@@ -57,25 +59,25 @@ def preprocess(ctx: Context) -> None:
 
 
 @task
-def trainEffNet(ctx: Context) -> None:
+def traineffnet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
 
 
 @task
-def trainResnet(ctx: Context) -> None:
+def trainresnet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name resnet50", echo=True, pty=not WINDOWS)
 
 
 @task
-def trainVgg(ctx: Context) -> None:
+def trainvgg(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name vgg16", echo=True, pty=not WINDOWS)
 
 
 @task
-def evaluateEffNet(ctx: Context) -> None:
+def evaluateeffnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth",
@@ -85,7 +87,7 @@ def evaluateEffNet(ctx: Context) -> None:
 
 
 @task
-def evaluateResnet(ctx: Context) -> None:
+def evaluateresnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth",
@@ -95,7 +97,7 @@ def evaluateResnet(ctx: Context) -> None:
 
 
 @task
-def evaluateVgg(ctx: Context) -> None:
+def evaluatevgg(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth",
@@ -124,6 +126,74 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
     )
 
 
+# Cloud commands
+@task
+def gcloud_build_image(ctx: Context) -> None:
+    """Build image in gcloud artifact registry."""
+    ctx.run(
+        "gcloud builds submit --config=cloudbuild.yaml . "
+        "--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
+        echo=True,
+        pty=not WINDOWS,
+    )
+
+
+@task
+def gcloud_train(ctx, machine: str = "cpu", epochs: int = 10) -> None:
+    """
+    Run a custom training job in Vertex AI using gcloud.
+
+    Args:
+        machine: Machine type, such as "cpu" or "gpu".
+    """
+    if machine == "gpu":
+        i = 1
+    elif machine == "cpu":
+        i = 4
+    else:
+        raise ValueError("Machine must be 'cpu' or 'gpu'.")
+
+    command = (
+        f"gcloud ai custom-jobs create "
+        f"--region=europe-west{i} "
+        f"--display-name=test-run "
+        f"--config=config_{machine}.yaml "
+        f"--command 'python' "
+        f"--args 'src/pet_fac_rec/train.py' "
+        f"--args '--epochs' "
+        f"--args '{epochs}' "
+    )
+    ctx.run(command, echo=True, pty=not WINDOWS)
+
+
+@task
+def gcloud_login(ctx: Context) -> None:
+    """Login to gcloud."""
+    ctx.run("gcloud auth application-default login", echo=True, pty=not WINDOWS)
+
+
+@task
+def gcloud_dvc_push(ctx: Context) -> None:
+    """Push data to dvc remote."""
+    ctx.run("dvc add ./data/")
+    ctx.run("git add ./data.dvc")
+    ctx.run("dvc push --no-run-cache", echo=True, pty=not WINDOWS)
+
+
+@task
+def loadbentomodel(ctx: Context) -> None:
+    """Load .onnx model into bento"""
+    ctx.run("python bentoml_api/src/load_model.py")
+
+
+@task
+def runbento(ctx: Context) -> None:
+    """Start a bentoml server"""
+    with ctx.cd("bentoml_api"):
+        ctx.run("bentoml build")
+        ctx.run("bentoml serve src.service:svc --reload")
+
+
 # Documentation commands
 @task(dev_requirements)
 def build_docs(ctx: Context) -> None:
@@ -133,9 +203,10 @@ def build_docs(ctx: Context) -> None:
 
 @task  # Run with: invoke git --message "My commit message"
 def git(ctx, message):
-    ctx.run(f"git add .")
+    ctx.run("git add .")
     ctx.run(f"git commit -m '{message}'")
-    ctx.run(f"git push")
+    ctx.run("git push")
+
 
 
 @task(dev_requirements)

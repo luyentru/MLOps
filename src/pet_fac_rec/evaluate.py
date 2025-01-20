@@ -13,7 +13,7 @@ app = typer.Typer()
 CURR_TIME = datetime.now().strftime("%Y-%m-%d_%H-%M-%Sa")
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
+logging.basicConfig(filename=f"reports/logs/eval_{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
 
 
@@ -48,9 +48,9 @@ def evaluate(
         name=f"eval_exp_{model_name}_{CURR_TIME}",
     )
 
-    print("Evaluating...")
-    print(f"Model: {model_name}")
-    print(f"Checkpoint: {model_checkpoint}")
+    log.info("Evaluating...")
+    log.info(f"Model: {model_name}")
+    log.info(f"Checkpoint: {model_checkpoint}")
 
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
@@ -80,8 +80,9 @@ def evaluate(
 
     test_acc = correct / total
     print(f"Test accuracy: {test_acc:.5f}")
-    wandb.log({"test_accuracy": test_acc})
 
+    log.info(f"Test accuracy: {correct / total:.5f}")
+    wandb.log({"test_accuracy": test_acc})
     wandb.finish()
 
 
