@@ -1,22 +1,31 @@
-import wandb
 import os
 import time
+
 import torch
-from pet_fac_rec.model import MyEfficientNetModel
 from dotenv import load_dotenv
 
+import wandb
+from pet_fac_rec.model import MyEfficientNetModel
+
+
 load_dotenv()
+WANDB_API_KEY = os.getenv("WANDB_API_KEY")
+WANDB_PROJECT = os.getenv("WANDB_PROJECT")
+WANDB_ENTITY = os.getenv("WANDB_ENTITY")
+WANDB_ENTITY_ORG = os.getenv("WANDB_ENTITY_ORG")
+WANDB_REGISTRY = os.getenv("WANDB_REGISTRY")
+WANDB_COLLECTION = os.getenv("WANDB_COLLECTION")
+wandb.login(key=WANDB_API_KEY)
 
 
 def test_model_speed():
-    model_name = os.getenv("MODEL_NAME")
+    model_name = "efficientnet"  # os.getenv("MODEL_NAME") # TODO: Redo this
     run = wandb.init()
-    artifact = run.use_artifact(
-        "luyentrungkien00-danmarks-tekniske-universitet-dtu-org/wandb-registry-model/pet-fac-rec-model:v0", type="model"
-    )
+    artifact = run.use_artifact(f"{WANDB_ENTITY_ORG}/{WANDB_REGISTRY}/{WANDB_COLLECTION}:latest", type="model")
     artifact_dir = artifact.download()
-    model = MyEfficientNetModel(4)
+    model = MyEfficientNetModel(num_classes=4)
     model.load_state_dict(torch.load(f"{artifact_dir}/{model_name}.pth"))
+
     model.eval()
 
     # Generate a random input appropriate for your model

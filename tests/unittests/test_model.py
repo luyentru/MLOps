@@ -9,7 +9,6 @@ def test_efficientnet_model_init():
     assert model.base_model.classifier[-1].out_features == 4, "EfficientNet does not create 4 output classes"
 
 
-
 def test_efficientnet_forward_pass():
     model = MyEfficientNetModel(num_classes=4)
     # Create sample input (batch_size=1, channels=3, height=224, width=224)

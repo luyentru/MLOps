@@ -208,7 +208,6 @@ def git(ctx, message):
     ctx.run("git push")
 
 
-
 @task(dev_requirements)
 def serve_docs(ctx: Context) -> None:
     """Serve documentation."""

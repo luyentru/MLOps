@@ -1,9 +1,9 @@
-import pytest
-from pathlib import Path
 import logging
 import os
-import pandas as pd
+from pathlib import Path
 
+import pandas as pd
+import pytest
 
 
 @pytest.fixture(autouse=True)
