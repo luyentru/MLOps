@@ -2,7 +2,9 @@ import logging
 from typing import List, Optional
 import random
 from datetime import datetime
+import os
 
+from dotenv import load_dotenv
 from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 import matplotlib.pyplot as plt
@@ -15,12 +17,16 @@ from torch.utils.data import DataLoader
 from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
 from pet_fac_rec.data import MyDataset, get_default_transforms
 from tqdm import tqdm
+import wandb
 
 app = typer.Typer()
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
+
+load_dotenv()
+WANDB_API_KEY = os.getenv("WANDB_API_KEY")
 
 
 def my_compose(overrides: Optional[List[str]]) -> DictConfig:
@@ -79,6 +85,14 @@ def train(
         "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     )
     print(f"Running on dev: {device}")  # Remove later
+
+    wandb.init(
+        project="pet_fac_rec",
+        entity="luyentrungkien00-danmarks-tekniske-universitet-dtu",
+        job_type="train",
+        name=f"exp_{current_time}",
+        config={"lr": hparams.lr, "batch_size": hparams.batch_size, "epochs": hparams.epochs},
+    )
 
     # Load the dataset
     transform = get_default_transforms()
@@ -161,8 +175,17 @@ def train(
             status = f"Epoch {epoch + 1}/{hparams.epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
             epoch_bar.set_description(status)
             log.info(status)
+            wandb.log(
+                {
+                    "train_loss": train_losses[-1],
+                    "train_accuracy": train_accuracies[-1],
+                    "valid_loss": val_losses[-1],
+                    "valid_accuracy": val_accuracies[-1],
+                }
+            )
 
     log.info("Training complete")
+    wandb.finish()
 
     # Save the model
     model_save_path = f"models/{model_name}.pth"
