@@ -1,8 +1,9 @@
-import onnx
 import bentoml
+import onnx
+
 
 # Loading ONNX file
-model_path = "models/efficientnet_v2.onnx"
+model_path = "models/efficientnet.onnx"
 model_proto = onnx.load(model_path)
 onnx.checker.check_model(model_proto)
 print("Model loaded succesfully!")

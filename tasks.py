@@ -1,7 +1,9 @@
 import os
 import sys
 
-from invoke import Context, task
+from invoke import Context
+from invoke import task
+
 
 WINDOWS = os.name == "nt"
 PROJECT_NAME = "pet_fac_rec"
@@ -57,25 +59,25 @@ def preprocess(ctx: Context) -> None:
 
 
 @task
-def trainEffNet(ctx: Context) -> None:
+def traineffnet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
 
 
 @task
-def trainResnet(ctx: Context) -> None:
+def trainresnet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name resnet50", echo=True, pty=not WINDOWS)
 
 
 @task
-def trainVgg(ctx: Context) -> None:
+def trainvgg(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name vgg16", echo=True, pty=not WINDOWS)
 
 
 @task
-def evaluateEffNet(ctx: Context) -> None:
+def evaluateeffnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth",
@@ -85,7 +87,7 @@ def evaluateEffNet(ctx: Context) -> None:
 
 
 @task
-def evaluateResnet(ctx: Context) -> None:
+def evaluateresnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth",
@@ -95,7 +97,7 @@ def evaluateResnet(ctx: Context) -> None:
 
 
 @task
-def evaluateVgg(ctx: Context) -> None:
+def evaluatevgg(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth",
@@ -129,8 +131,8 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
 def gcloud_build_image(ctx: Context) -> None:
     """Build image in gcloud artifact registry."""
     ctx.run(
-        f"gcloud builds submit --config=cloudbuild.yaml . "
-        f"--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
+        "gcloud builds submit --config=cloudbuild.yaml . "
+        "--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
         echo=True,
         pty=not WINDOWS,
     )
@@ -150,7 +152,7 @@ def gcloud_train(ctx, machine: str = "cpu", epochs: int = 10) -> None:
         i = 4
     else:
         raise ValueError("Machine must be 'cpu' or 'gpu'.")
-    
+
     command = (
         f"gcloud ai custom-jobs create "
         f"--region=europe-west{i} "
@@ -163,21 +165,35 @@ def gcloud_train(ctx, machine: str = "cpu", epochs: int = 10) -> None:
     )
     ctx.run(command, echo=True, pty=not WINDOWS)
 
-    
+
 @task
 def gcloud_login(ctx: Context) -> None:
     """Login to gcloud."""
-    ctx.run(f"gcloud auth application-default login", echo=True, pty=not WINDOWS)
-    
-        
+    ctx.run("gcloud auth application-default login", echo=True, pty=not WINDOWS)
+
+
 @task
 def gcloud_dvc_push(ctx: Context) -> None:
     """Push data to dvc remote."""
-    ctx.run(f"dvc add ./data/")
-    ctx.run(f"git add ./data.dvc")
-    ctx.run(f"dvc push --no-run-cache", echo=True, pty=not WINDOWS)
-    
-    
+    ctx.run("dvc add ./data/")
+    ctx.run("git add ./data.dvc")
+    ctx.run("dvc push --no-run-cache", echo=True, pty=not WINDOWS)
+
+
+@task
+def loadbentomodel(ctx: Context) -> None:
+    """Load .onnx model into bento"""
+    ctx.run("python bentoml_api/src/load_model.py")
+
+
+@task
+def runbento(ctx: Context) -> None:
+    """Start a bentoml server"""
+    with ctx.cd("bentoml_api"):
+        ctx.run("bentoml build")
+        ctx.run("bentoml serve src.service:svc --reload")
+
+
 # Documentation commands
 @task(dev_requirements)
 def build_docs(ctx: Context) -> None:
