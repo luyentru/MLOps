@@ -26,6 +26,7 @@ def test_model_speed():
     model = MyEfficientNetModel(num_classes=4)
     model.load_state_dict(torch.load(f"{artifact_dir}/{model_name}.pth"))
 
+    model.to("cpu")
     model.eval()
 
     # Generate a random input appropriate for your model
