@@ -37,6 +37,7 @@ WANDB_ENTITY_ORG = os.getenv("WANDB_ENTITY_ORG")
 WANDB_REGISTRY = os.getenv("WANDB_REGISTRY")
 WANDB_COLLECTION = os.getenv("WANDB_COLLECTION")
 
+wandb.login(key=WANDB_API_KEY)
 
 def my_compose(overrides: Optional[List[str]]) -> DictConfig:
     with initialize(config_path="configs", job_name="train_model"):
