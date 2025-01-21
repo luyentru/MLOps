@@ -10,6 +10,7 @@ import numpy as np
 import onnx
 import torch
 import typer
+import wandb
 from dotenv import load_dotenv
 from hydra import compose
 from hydra import initialize
@@ -19,7 +20,6 @@ from torch.profiler import record_function
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import wandb
 from pet_fac_rec.data import MyDataset
 from pet_fac_rec.model import MyEfficientNetModel
 from pet_fac_rec.model import MyResNet50Model
