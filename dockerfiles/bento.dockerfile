@@ -32,4 +32,5 @@ WORKDIR /app/bentoml_api
 RUN bentoml build
 
 # Set the entrypoint to serve the BentoML service
+EXPOSE 5000
 ENTRYPOINT ["bentoml", "serve", "src.service:svc", "--reload", "--host", "0.0.0.0", "--port", "5000"]
