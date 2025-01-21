@@ -1,16 +1,20 @@
-from pathlib import Path
 import logging
-import pandas as pd
-import kagglehub as kh
+import os
 import shutil
-from typing import Optional, Tuple
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+from typing import Tuple
+
+import kagglehub as kh
+import pandas as pd
 import typer
+from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-from PIL import Image
-from datetime import datetime
+
 from pet_fac_rec.preprocessing import get_transforms
-import os
+
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 os.makedirs("reports/logs", exist_ok=True)

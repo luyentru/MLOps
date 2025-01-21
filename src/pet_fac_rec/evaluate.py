@@ -80,6 +80,7 @@ def evaluate(
 
     test_acc = correct / total
     print(f"Test accuracy: {test_acc:.5f}")
+
     log.info(f"Test accuracy: {correct / total:.5f}")
     wandb.log({"test_accuracy": test_acc})
     wandb.finish()
