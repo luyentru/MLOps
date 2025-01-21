@@ -1,9 +1,15 @@
-from locust import HttpUser, TaskSet, task, between
-from pathlib import Path
 import random
+from pathlib import Path
+
+from locust import HttpUser
+from locust import TaskSet
+from locust import between
+from locust import task
+
 
 # Path to the directory containing test images
-TEST_IMAGE_DIR = Path("data/valid/happy")
+TEST_IMAGE_DIR = Path("tests")
+
 
 class PredictTaskSet(TaskSet):
     @task

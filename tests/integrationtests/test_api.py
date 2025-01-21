@@ -6,7 +6,7 @@ from pet_fac_rec.api import app
 
 
 # Path to the test image file
-TEST_IMAGE_PATH = Path("tests/integrationtests/testimage_happy.jpg")
+TEST_IMAGE_PATH = Path("tests/testimage_happy.jpg")
 
 
 def test_predict_endpoint():
