@@ -1089,7 +1089,7 @@
     <span class="p">)</span>
 
     <span class="c1"># Load the dataset</span>
-    <span class="n">test_set</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">csv_file</span><span class="o">=</span><span class="n">data_csv</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">get_default_transforms</span><span class="p">())</span>
+    <span class="n">test_set</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">(</span><span class="n">csv_file</span><span class="o">=</span><span class="n">data_csv</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">get_transforms</span><span class="p">())</span>
     <span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_set</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Initialize the model</span>
