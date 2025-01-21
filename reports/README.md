@@ -214,7 +214,7 @@ are using (M2+M6)
 
 > Answer:
 
---- question 3 fill here ---
+--- For the project, we chose to work with torchvision, a package not covered extensively in our course. Torchvision is part of the PyTorch ecosystem and offers a range of pre-trained models, including EfficientNet, ResNet, and VGG, which we utilized to significantly expedite our model development process. By leveraging these pre-trained models, we were able to implement state-of-the-art architectures for our tasks without having to train them from scratch, which saved us a lot of time. ---
 
 ## Coding environment
 
