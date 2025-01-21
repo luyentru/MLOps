@@ -12,6 +12,7 @@ COPY requirements.txt pyproject.toml README.md ./
 COPY src/ src/
 COPY data/ data/
 COPY reports/ reports/
+COPY .env ./
 
 # Set work directory
 WORKDIR /

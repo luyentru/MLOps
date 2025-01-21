@@ -214,7 +214,7 @@ are using (M2+M6)
 
 > Answer:
 
---- question 3 fill here ---
+--- For the project, we chose to work with torchvision, a package not covered extensively in our course. Torchvision is part of the PyTorch ecosystem and offers a range of pre-trained models, including EfficientNet, ResNet, and VGG, which we utilized to significantly expedite our model development process. By leveraging these pre-trained models, we were able to implement state-of-the-art architectures for our tasks without having to train them from scratch, which saved us a lot of time. ---
 
 ## Coding environment
 
@@ -275,7 +275,7 @@ We use pip-tools to maintain dependencies, making it easy to update packages whi
 
 > Answer:
 
---- question 5 fill here ---
+--- We used most of the directories and files from the cookiecutter template to structure our project. Initially, we used the data-folder for local data-storage, until we used the GCP bucket linked with the DVC for data management. We adapted the data-storage structure by removing the processed/raw-folders and replacing them with test/train/valid folders to store the data. Moreover, we removed the notebooks-folder as we did not use any Jupyter notebooks for our project. To store experiment configurations, we added a config-directory within the src-folder to separate the configuration files from the code. We also added sub-folders in the tests-directory to structure our tests into unittests, and integrationtests. Lastly, we added a requirements_tests.txt for the testing frameworks and tools. Therefore, we retained most aspects from the template but made small adjustments to fit the structure of our repository to the project's organization. ---
 
 ### Question 6
 
@@ -347,7 +347,18 @@ These practices matter in larger projects because:
 
 > Answer:
 
---- question 7 fill here ---
+--- 
+In total we have implemented 5 tests.
+
+1. `test_model_speed`: This test is designed to validate the continuous integration workflow on GitHub, ensuring that any changes to the model code trigger the workflow to verify model prediction speeds under specific conditions.
+
+2. `test_dataset_download`: This test ensures the functionality of dataset handling, including data downloading, preprocessing, and integrity. The tests ensure that data files are not empty, that required directories and labels exist, and that the structure of the dataset (e.g., train, valid, test splits) is correct. It also checks for the existence of expected data columns in a CSV file.
+
+3. `test_efficientnet_model_init`: This test checks that the initialized model has the correct number of output classes.
+
+4. `test_efficientnet_forward_pass`: This test verifies the model's forward pass by creating a sample input and running it through the model to check the output shape and type. It ensures the output tensor is correctly sized for the batch and class dimensions, and checks that the output is indeed a PyTorch tensor.
+
+5. `test_efficientnet_pretrained_parameter`: This test checks both the pretrained and non-pretrained initialization options of the model to confirm they are instances of the specified model class. ---
 
 ### Question 8
 

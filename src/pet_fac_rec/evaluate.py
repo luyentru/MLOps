@@ -1,15 +1,24 @@
-import torch
-import typer
-from pathlib import Path
 import logging
 from datetime import datetime
-from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
-from pet_fac_rec.data import MyDataset, get_default_transforms
+from pathlib import Path
+
+import torch
+import typer
+import wandb
+from dotenv import load_dotenv
+
+from pet_fac_rec.data import MyDataset
+from pet_fac_rec.data import get_default_transforms
+from pet_fac_rec.model import MyEfficientNetModel
+from pet_fac_rec.model import MyResNet50Model
+from pet_fac_rec.model import MyVGG16Model
+
 
 app = typer.Typer()
+CURR_TIME = datetime.now().strftime("%Y-%m-%d_%H-%M-%Sa")
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
+logging.basicConfig(filename=f"reports/logs/eval_{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
 
 
@@ -36,6 +45,14 @@ def evaluate(
     """
     Evaluate a trained model.
     """
+    load_dotenv()
+    wandb.init(
+        project="pet_fac_rec",
+        entity="luyentrungkien00-danmarks-tekniske-universitet-dtu",
+        job_type="evaluate",
+        name=f"eval_exp_{model_name}_{CURR_TIME}",
+    )
+
     log.info("Evaluating...")
     log.info(f"Model: {model_name}")
     log.info(f"Checkpoint: {model_checkpoint}")
@@ -66,7 +83,12 @@ def evaluate(
         correct += (preds == target).sum().item()
         total += target.size(0)
 
+    test_acc = correct / total
+    print(f"Test accuracy: {test_acc:.5f}")
+
     log.info(f"Test accuracy: {correct / total:.5f}")
+    wandb.log({"test_accuracy": test_acc})
+    wandb.finish()
 
 
 if __name__ == "__main__":

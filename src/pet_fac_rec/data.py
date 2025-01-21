@@ -1,9 +1,13 @@
-from pathlib import Path
 import logging
-import pandas as pd
-import kagglehub as kh
+import os
 import shutil
-from typing import Optional, Tuple
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+from typing import Tuple
+
+import kagglehub as kh
+import pandas as pd
 import typer
 import torch
 from torch.utils.data import Dataset
@@ -13,10 +17,16 @@ from datetime import datetime
 from matplotlib import pyplot as plt
 
 from utils import show_image_and_target
+from pet_fac_rec.preprocessing import get_transforms
+
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+os.makedirs("reports/logs", exist_ok=True)
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
+
+# define image classes
+label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
 
 class MyDataset(Dataset):
@@ -39,7 +49,7 @@ class MyDataset(Dataset):
         self.images = list(self.data["file_path"])
         self.target = torch.tensor(self.data["label"].values, dtype=torch.long)
         self.num_classes = len(self.labels)
-        self.transform = transform
+        self.transform = transform or get_transforms()
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
@@ -112,7 +122,6 @@ def preprocess(output_folder: Path) -> None:
 
     # Walk through each subdirectory and file to create a data list
     data = []
-    label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
     for split in ["train", "valid", "test"]:
         split_path = output_folder / split
@@ -127,7 +136,11 @@ def preprocess(output_folder: Path) -> None:
                         data.append(
                             {
                                 "split": split,
-                                "label": label_mapping.get(label_dir.name.lower(), -1),
+                                "label": label_mapping.
+                              
+                              
+                              
+                              (label_dir.name.lower(), -1),
                                 "file_path": str(file),
                             }
                         )
@@ -137,17 +150,6 @@ def preprocess(output_folder: Path) -> None:
     csv_path = output_folder / "data.csv"
     data_df.to_csv(csv_path, index=False)
     log.info(f"Data saved to CSV at: {csv_path}")
-
-
-def get_default_transforms() -> transforms.Compose:
-    """Return default transformations for the dataset."""
-    return transforms.Compose(
-        [
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
 
 
 def dataset_statistics(datadir: str = "data/data.csv") -> None:
@@ -182,6 +184,7 @@ def dataset_statistics(datadir: str = "data/data.csv") -> None:
     plt.ylabel("Count")
     plt.savefig("test_label_distribution.png")
     plt.close()
+
 
 def main():
     typer.run(preprocess)

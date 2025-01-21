@@ -1,3 +1,6 @@
+# Ignore wandb outputs
+wandb
+
 # Ignore profiler logs
 profiler/
 lightning_logs/
@@ -10,6 +13,10 @@ lightning_logs/
 
 # Ignore all .png files
 *.png
+
+# Allow specific .png files in the docs folder
+!docs/source/images/architecture.png
+!docs/source/images/training_statistics.png
 
 # Ignore pretrained models
 models/
@@ -107,7 +114,7 @@ instance/
 .webassets-cache
 
 # Secret keys:
-key.json 
+key.json
 
 # Scrapy stuff:
 .scrapy
