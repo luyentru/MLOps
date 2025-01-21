@@ -347,7 +347,18 @@ These practices matter in larger projects because:
 
 > Answer:
 
---- question 7 fill here ---
+--- 
+In total we have implemented 5 tests.
+
+1. `test_model_speed`: This test is designed to validate the continuous integration workflow on GitHub, ensuring that any changes to the model code trigger the workflow to verify model prediction speeds under specific conditions.
+
+2. `test_dataset_download`: This test ensures the functionality of dataset handling, including data downloading, preprocessing, and integrity. The tests ensure that data files are not empty, that required directories and labels exist, and that the structure of the dataset (e.g., train, valid, test splits) is correct. It also checks for the existence of expected data columns in a CSV file.
+
+3. `test_efficientnet_model_init`: This test checks that the initialized model has the correct number of output classes.
+
+4. `test_efficientnet_forward_pass`: This test verifies the model's forward pass by creating a sample input and running it through the model to check the output shape and type. It ensures the output tensor is correctly sized for the batch and class dimensions, and checks that the output is indeed a PyTorch tensor.
+
+5. `test_efficientnet_pretrained_parameter`: This test checks both the pretrained and non-pretrained initialization options of the model to confirm they are instances of the specified model class. ---
 
 ### Question 8
 
