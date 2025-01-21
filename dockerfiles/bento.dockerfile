@@ -31,8 +31,5 @@ RUN python bentoml_api/src/load_model.py
 WORKDIR /app/bentoml_api
 RUN bentoml build
 
-# Expose port 5000 for BentoML server
-EXPOSE 5000
-
 # Set the entrypoint to serve the BentoML service
 ENTRYPOINT ["bentoml", "serve", "src.service:svc", "--reload", "--host", "0.0.0.0", "--port", "5000"]

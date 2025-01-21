@@ -1,5 +1,6 @@
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
 from invoke import Context
 from invoke import task
@@ -180,6 +181,9 @@ def gcloud_dvc_push(ctx: Context) -> None:
     ctx.run("dvc push --no-run-cache", echo=True, pty=not WINDOWS)
 
 
+# Backend Tasks
+
+
 @task
 def loadbentomodel(ctx: Context) -> None:
     """Load .onnx model into bento"""
@@ -201,9 +205,47 @@ def buildbentoimage(ctx: Context) -> None:
 
 
 @task
-def runbentocontainer(ctx: Context, name: str = "bento_container") -> None:
+def runbentocontainer(ctx: Context, name: str = "backend") -> None:
     """Run bento API as docker container. Access locally via localhost:8080. Args: name (str): Docker Container Name"""
     ctx.run(f"docker run -p 8080:5000 --name {name} bento-image")
+
+
+# Frontend Tasks
+
+
+@task
+def buildstreamlitimage(ctx: Context) -> None:
+    """Build a docker image for the streamlit frontend"""
+    ctx.run("docker build -t frontend-image -f dockerfiles/frontend.dockerfile .")
+
+
+@task
+def runstreamlitcontainer(ctx: Context, name: str = "frontend") -> None:
+    """Run a container with the streamlit frontend, accessible via localhost:9000"""
+    ctx.run(f"docker run -p 9000:9000 --name {name} frontend-image")
+
+
+# Run Frontend and Backend in one Network
+# Make sure to delete any containers named "frontend" or "backend" before running
+@task
+def runfrontendbackend(ctx: Context) -> None:
+    # Create Docker Network
+    ctx.run("docker network create pet_fac_network")
+
+    # Run Backend Tasks
+    def run_backend():
+        ctx.run("docker build -t bento-image -f dockerfiles/bento.dockerfile .")
+        ctx.run("docker run --name backend --network pet_fac_network bento-image")
+
+    # Run Frontend Tasks
+    def run_frontend():
+        ctx.run("docker build -t frontend-image -f dockerfiles/frontend.dockerfile .")
+        ctx.run("docker run -p 9000:9000 --name frontend --network pet_fac_network frontend-image")
+
+    # Run Backend and Frontend in parallel
+    with ThreadPoolExecutor() as executor:
+        executor.submit(run_backend)
+        executor.submit(run_frontend)
 
 
 # Documentation commands
