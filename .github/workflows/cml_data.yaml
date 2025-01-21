@@ -47,7 +47,7 @@ jobs:
 
       - name: Pull data
         run: |
-          dvc pull ./data --no-run-cache
+          dvc pull ./data --no-run-cache -v
 
       - name: Check data statistics
         run: |
