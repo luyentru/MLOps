@@ -3,8 +3,8 @@ site_author: MLOppers
 docs_dir: source
 
 theme:
-  language: en
   name: material
+  language: en
   features:
     - content.code.copy
     - content.code.annotate
@@ -15,7 +15,12 @@ plugins:
       handlers:
         python:
           setup_commands:
-           - "import sys; import logging; sys.path.insert(0, '../'); logging.basicConfig(level=logging.INFO); logging.info(f'sys.path: {sys.path}')"
+            - |
+              import sys
+              import logging
+              sys.path.insert(0, '../')
+              logging.basicConfig(level=logging.INFO)
+              logging.info(f'sys.path: {sys.path}')
           options:
             show_root_heading: true
             separate_signature: true
@@ -26,8 +31,13 @@ plugins:
             parameter_headings: false
             show_category_heading: true
 
+extra:
+  include_dirs:
+    - ../reports/figures
+
 nav:
   - Home: index.md
-  - Data: my_api.md
-  - Model: model.md
-  - Visualization: visualization.md
+  - Documentation:
+      - Data: data.md
+      - Model: model.md
+      - Visualization: visualization.md
