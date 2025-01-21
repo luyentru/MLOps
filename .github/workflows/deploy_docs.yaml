@@ -33,8 +33,10 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install mkdocstrings[python]  # Install mkdocstrings and Python handler
+        pip install mkdocstrings[python]
 
     - name: Deploy docs
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
       working-directory: docs
       run: mkdocs gh-deploy --config-file mkdocs.yaml --force
