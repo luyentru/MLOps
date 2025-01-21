@@ -21,7 +21,7 @@ wandb.login(key=WANDB_API_KEY)
 def test_model_speed():
     model_name = "efficientnet"  # os.getenv("MODEL_NAME") # TODO: Redo this
     run = wandb.init()
-    artifact = run.use_artifact(f"{WANDB_ENTITY_ORG}/{WANDB_REGISTRY}/{WANDB_COLLECTION}:latest", type="model")
+    artifact = run.use_artifact(f"{WANDB_ENTITY_ORG}/{WANDB_REGISTRY}/{WANDB_COLLECTION}:staging", type="model")
     artifact_dir = artifact.download()
     model = MyEfficientNetModel(num_classes=4)
     model.load_state_dict(torch.load(f"{artifact_dir}/{model_name}.pth", map_location="cpu"))
