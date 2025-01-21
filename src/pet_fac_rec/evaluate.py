@@ -4,14 +4,14 @@ from pathlib import Path
 
 import torch
 import typer
-import wandb
 from dotenv import load_dotenv
 
+import wandb
 from pet_fac_rec.data import MyDataset
-from pet_fac_rec.data import get_default_transforms
 from pet_fac_rec.model import MyEfficientNetModel
 from pet_fac_rec.model import MyResNet50Model
 from pet_fac_rec.model import MyVGG16Model
+from pet_fac_rec.preprocessing import get_transforms
 
 
 app = typer.Typer()
@@ -62,7 +62,7 @@ def evaluate(
     )
 
     # Load the dataset
-    test_set = MyDataset(csv_file=data_csv, split="test", transform=get_default_transforms())
+    test_set = MyDataset(csv_file=data_csv, split="test", transform=get_transforms())
     test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=False)
 
     # Initialize the model
