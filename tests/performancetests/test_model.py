@@ -24,13 +24,13 @@ def test_model_speed():
     artifact = run.use_artifact(f"{WANDB_ENTITY_ORG}/{WANDB_REGISTRY}/{WANDB_COLLECTION}:latest", type="model")
     artifact_dir = artifact.download()
     model = MyEfficientNetModel(num_classes=4)
-    model.load_state_dict(torch.load(f"{artifact_dir}/{model_name}.pth"))
+    model.load_state_dict(torch.load(f"{artifact_dir}/{model_name}.pth", map_location="cpu"))
 
     model.to("cpu")
     model.eval()
 
     # Generate a random input appropriate for your model
-    test_input = torch.rand(1, 3, 224, 224)  # Example for an image model
+    test_input = torch.rand(1, 3, 224, 224).to("cpu")  # Example for an image model
 
     # Timing the model predictions
     start_time = time.time()
