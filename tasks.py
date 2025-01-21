@@ -194,6 +194,18 @@ def runbento(ctx: Context) -> None:
         ctx.run("bentoml serve src.service:svc --reload")
 
 
+@task
+def buildbentoimage(ctx: Context) -> None:
+    """Build a docker image for a bentoml API"""
+    ctx.run("docker build -t bento-image -f dockerfiles/bento.dockerfile .")
+
+
+@task
+def runbentocontainer(ctx: Context, name: str = "bento_container") -> None:
+    """Run bento API as docker container. Access locally via localhost:8080. Args: name (str): Docker Container Name"""
+    ctx.run(f"docker run -p 8080:5000 --name {name} bento-image")
+
+
 # Documentation commands
 @task(dev_requirements)
 def build_docs(ctx: Context) -> None:
