@@ -1,25 +1,11 @@
-name: Unit Tests
+name: DVC Workflow
 
 on:
-  push:
-    branches:
-      - main
-      - development
-      - unit_tests
-  pull_request:
-    branches:
-      - main
-      - development
-  workflow_dispatch:
+  workflow_dispatch: 
 
 jobs:
-  test:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.11"]
-
+  dataset_statistics:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,10 +25,14 @@ jobs:
           python -m pip install -U pip setuptools wheel
           pip install -r requirements.txt
           pip install -r requirements_dev.txt
-          pip install -r requirements_tests.txt
           pip list
 
-      - name: Run tests & coverage
+      - name: Auth with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.BUCKET_DVC_MANAGER_KEY }}
+
+      - name: Pull data
         run: |
-          coverage run -m pytest tests/
-          coverage report -m
+          dvc pull --no-run-cache -v
+

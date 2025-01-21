@@ -14,7 +14,7 @@ on:
     paths:
       - '**/data.dvc'
       - '.dvc/**'
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   dataset_statistics:
