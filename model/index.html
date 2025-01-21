@@ -614,27 +614,14 @@
 
 
 </h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">train</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
-        <span class="s2">&quot;efficientnet&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">,</span>
-    <span class="p">),</span>
-    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">train</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s1">&#39;efficientnet&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">),</span> <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
 
             <details class="quote">
               <summary>Source code in <code>pet_fac_rec/train.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
 <span class="normal"> 80</span>
@@ -797,7 +784,27 @@
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
-<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s2">&quot;efficientnet&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">),</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
@@ -806,16 +813,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration: </span><span class="si">{</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Remove later</span>
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Configuration: </span><span class="si">{</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">hparams</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">experiment</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Train the MyEfficientNetModel on the custom dataset.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        lr (float): Learning rate for the optimizer.</span>
-<span class="sd">        batch_size (int): Batch size for training.</span>
-<span class="sd">        epochs (int): Number of epochs to train the model.</span>
-<span class="sd">        data_csv (Path): Path to the CSV file containing the preprocessed data.</span>
-<span class="sd">        num_classes (int): Number of output classes in the dataset.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Set the seed for reproducibility</span>
     <span class="n">set_seed</span><span class="p">(</span><span class="n">hparams</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
@@ -825,9 +823,9 @@
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on dev: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Remove later</span>
 
-    <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
-        <span class="n">project</span><span class="o">=</span><span class="s2">&quot;pet_fac_rec&quot;</span><span class="p">,</span>
-        <span class="n">entity</span><span class="o">=</span><span class="s2">&quot;luyentrungkien00-danmarks-tekniske-universitet-dtu&quot;</span><span class="p">,</span>
+    <span class="n">run</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
+        <span class="n">project</span><span class="o">=</span><span class="n">WANDB_PROJECT</span><span class="p">,</span>
+        <span class="n">entity</span><span class="o">=</span><span class="n">WANDB_ENTITY</span><span class="p">,</span>
         <span class="n">job_type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;exp_</span><span class="si">{</span><span class="n">current_time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span> <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">epochs</span><span class="p">},</span>
@@ -913,8 +911,10 @@
             <span class="n">val_accuracies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_correct</span> <span class="o">/</span> <span class="n">total_samples</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">hparams</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s2"> | &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Train Loss: </span><span class="si">{</span><span class="n">train_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> | Train Acc: </span><span class="si">{</span><span class="n">train_accuracies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> | &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Val Loss: </span><span class="si">{</span><span class="n">val_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> | Val Acc: </span><span class="si">{</span><span class="n">val_accuracies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Train Loss: </span><span class="si">{</span><span class="n">train_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> | &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Train Acc: </span><span class="si">{</span><span class="n">train_accuracies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> | &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Val Loss: </span><span class="si">{</span><span class="n">val_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> | &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Val Acc: </span><span class="si">{</span><span class="n">val_accuracies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
             <span class="n">epoch_bar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
@@ -928,12 +928,30 @@
             <span class="p">)</span>
 
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training complete&quot;</span><span class="p">)</span>
-    <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 
     <span class="c1"># Save the model</span>
     <span class="n">model_save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;models/</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">.pth&quot;</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">model_save_path</span><span class="p">)</span>
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model saved to </span><span class="si">{</span><span class="n">model_save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">artifact</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">Artifact</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pet_fac_rec_model&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A model trained to classify facial expressions of animals&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;train_loss&quot;</span><span class="p">:</span> <span class="n">train_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;train_accuracy&quot;</span><span class="p">:</span> <span class="n">train_accuracies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;valid_loss&quot;</span><span class="p">:</span> <span class="n">val_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;valid_accuracy&quot;</span><span class="p">:</span> <span class="n">val_accuracies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">artifact</span><span class="o">.</span><span class="n">add_file</span><span class="p">(</span><span class="n">model_save_path</span><span class="p">)</span>
+    <span class="n">logged_art</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">artifact</span><span class="p">)</span>
+    <span class="n">run</span><span class="o">.</span><span class="n">link_artifact</span><span class="p">(</span>
+        <span class="n">artifact</span><span class="o">=</span><span class="n">logged_art</span><span class="p">,</span>
+        <span class="n">target_path</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WANDB_ENTITY_ORG</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">WANDB_REGISTRY</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">WANDB_COLLECTION</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;staging&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">artifact</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 
     <span class="c1"># Export ONNX file</span>
     <span class="k">try</span><span class="p">:</span>
@@ -968,6 +986,8 @@
 
     <span class="c1"># Plot training statistics</span>
     <span class="n">plot_training_statistics</span><span class="p">(</span><span class="n">train_losses</span><span class="p">,</span> <span class="n">train_accuracies</span><span class="p">,</span> <span class="n">val_losses</span><span class="p">,</span> <span class="n">val_accuracies</span><span class="p">)</span>
+
+    <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -982,17 +1002,7 @@
 
 
 </h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">evaluate</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
-        <span class="s2">&quot;efficientnet&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">,</span>
-    <span class="p">),</span>
-    <span class="n">model_checkpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
-        <span class="o">...</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the model checkpoint file (e.g., efficientnet.pth)&quot;</span><span class="p">,</span>
-    <span class="p">),</span>
-    <span class="n">data_csv</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/data.csv&quot;</span><span class="p">),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">evaluate</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s1">&#39;efficientnet&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">),</span> <span class="n">model_checkpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to the model checkpoint file (e.g., efficientnet.pth)&#39;</span><span class="p">),</span> <span class="n">data_csv</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data/data.csv&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -1052,7 +1062,8 @@
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span>
-<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s2">&quot;efficientnet&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">),</span>
     <span class="n">model_checkpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the model checkpoint file (e.g., efficientnet.pth)&quot;</span><span class="p">),</span>
@@ -1101,6 +1112,7 @@
 
     <span class="n">test_acc</span> <span class="o">=</span> <span class="n">correct</span> <span class="o">/</span> <span class="n">total</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test accuracy: </span><span class="si">{</span><span class="n">test_acc</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test accuracy: </span><span class="si">{</span><span class="n">correct</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">total</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">({</span><span class="s2">&quot;test_accuracy&quot;</span><span class="p">:</span> <span class="n">test_acc</span><span class="p">})</span>
     <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
