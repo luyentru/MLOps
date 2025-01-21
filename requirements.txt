@@ -65,3 +65,4 @@ urllib3==2.3.0
 uvicorn==0.34.0
 virtualenv==20.28.1
 wandb==0.19.3
+

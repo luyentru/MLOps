@@ -1,12 +1,17 @@
 import logging
 from datetime import datetime
+
 import matplotlib.pyplot as plt
+
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
 
-def plot_training_statistics(train_losses, train_accuracies, val_losses, val_accuracies, output_path="reports/figures/training_statistics.png"):
+
+def plot_training_statistics(
+    train_losses, train_accuracies, val_losses, val_accuracies, output_path="reports/figures/training_statistics.png"
+):
     """
     Plot training and validation statistics.
 

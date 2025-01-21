@@ -1,27 +1,32 @@
 import logging
-from typing import List, Optional
+import os
 import random
 from datetime import datetime
-import os
-
-from dotenv import load_dotenv
-from hydra import compose, initialize
-from omegaconf import DictConfig, OmegaConf
-import matplotlib.pyplot as plt
-import torch
-from torch.profiler import record_function
-import typer
-import numpy as np
 from pathlib import Path
+from typing import List
+from typing import Optional
+
+import numpy as np
+import onnx
+import torch
+import typer
+from dotenv import load_dotenv
+from hydra import compose
+from hydra import initialize
+from omegaconf import DictConfig
+from omegaconf import OmegaConf
+from torch.profiler import record_function
 from torch.utils.data import DataLoader
-from pet_fac_rec.model import MyEfficientNetModel, MyResNet50Model, MyVGG16Model
+from tqdm import tqdm
+
+import wandb
 from pet_fac_rec.data import MyDataset
+from pet_fac_rec.model import MyEfficientNetModel
+from pet_fac_rec.model import MyResNet50Model
+from pet_fac_rec.model import MyVGG16Model
 from pet_fac_rec.preprocessing import get_transforms
 from pet_fac_rec.visualize import plot_training_statistics
-from pet_fac_rec.data import MyDataset, get_default_transforms
-from tqdm import tqdm
-import onnx
-import wandb
+
 
 app = typer.Typer()
 
@@ -31,6 +36,13 @@ log = logging.getLogger(__name__)
 
 load_dotenv()
 WANDB_API_KEY = os.getenv("WANDB_API_KEY")
+WANDB_PROJECT = os.getenv("WANDB_PROJECT")
+WANDB_ENTITY = os.getenv("WANDB_ENTITY")
+WANDB_ENTITY_ORG = os.getenv("WANDB_ENTITY_ORG")
+WANDB_REGISTRY = os.getenv("WANDB_REGISTRY")
+WANDB_COLLECTION = os.getenv("WANDB_COLLECTION")
+
+wandb.login(key=WANDB_API_KEY)
 
 
 def my_compose(overrides: Optional[List[str]]) -> DictConfig:
@@ -71,16 +83,7 @@ def train(
     print(f"Configuration: {OmegaConf.to_yaml(cfg)}")  # Remove later
     log.info(f"Configuration: {OmegaConf.to_yaml(cfg)}")
     hparams = cfg.experiment
-    """
-    Train the MyEfficientNetModel on the custom dataset.
 
-    Args:
-        lr (float): Learning rate for the optimizer.
-        batch_size (int): Batch size for training.
-        epochs (int): Number of epochs to train the model.
-        data_csv (Path): Path to the CSV file containing the preprocessed data.
-        num_classes (int): Number of output classes in the dataset.
-    """
     # Set the seed for reproducibility
     set_seed(hparams.seed)
 
@@ -90,9 +93,9 @@ def train(
     )
     print(f"Running on dev: {device}")  # Remove later
 
-    wandb.init(
-        project="pet_fac_rec",
-        entity="luyentrungkien00-danmarks-tekniske-universitet-dtu",
+    run = wandb.init(
+        project=WANDB_PROJECT,
+        entity=WANDB_ENTITY,
         job_type="train",
         name=f"exp_{current_time}",
         config={"lr": hparams.lr, "batch_size": hparams.batch_size, "epochs": hparams.epochs},
@@ -176,7 +179,13 @@ def train(
 
             val_losses.append(val_loss / total_samples)
             val_accuracies.append(total_correct / total_samples)
-            status = f"Epoch {epoch + 1}/{hparams.epochs} | Train Loss: {train_losses[-1]:.5f} | Train Acc: {train_accuracies[-1]:.5f} | Val Loss: {val_losses[-1]:.5f} | Val Acc: {val_accuracies[-1]:.5f}"
+            status = (
+                f"Epoch {epoch + 1}/{hparams.epochs} | "
+                f"Train Loss: {train_losses[-1]:.5f} | "
+                f"Train Acc: {train_accuracies[-1]:.5f} | "
+                f"Val Loss: {val_losses[-1]:.5f} | "
+                f"Val Acc: {val_accuracies[-1]:.5f}"
+            )
             epoch_bar.set_description(status)
             log.info(status)
             wandb.log(
@@ -189,12 +198,30 @@ def train(
             )
 
     log.info("Training complete")
-    wandb.finish()
 
     # Save the model
     model_save_path = f"models/{model_name}.pth"
     torch.save(model.state_dict(), model_save_path)
     log.info(f"Model saved to {model_save_path}")
+    artifact = wandb.Artifact(
+        name="pet_fac_rec_model",
+        type="model",
+        description="A model trained to classify facial expressions of animals",
+        metadata={
+            "train_loss": train_losses[-1],
+            "train_accuracy": train_accuracies[-1],
+            "valid_loss": val_losses[-1],
+            "valid_accuracy": val_accuracies[-1],
+        },
+    )
+    artifact.add_file(model_save_path)
+    logged_art = run.log_artifact(artifact)
+    run.link_artifact(
+        artifact=logged_art,
+        target_path=f"{WANDB_ENTITY_ORG}/{WANDB_REGISTRY}/{WANDB_COLLECTION}",
+        aliases=["staging"],
+    )
+    artifact.save()
 
     # Export ONNX file
     try:
@@ -229,6 +256,8 @@ def train(
 
     # Plot training statistics
     plot_training_statistics(train_losses, train_accuracies, val_losses, val_accuracies)
+
+    wandb.finish()
 
 
 if __name__ == "__main__":
