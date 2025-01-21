@@ -146,16 +146,16 @@ def gcloud_queue(ctx, configname: str) -> None:
     Args:
         configname: Name of the config file.
     """
-    
+
     # Create directory using os.makedirs
     target_dir = os.path.join("vertex_train", "completed", configname)
     os.makedirs(target_dir, exist_ok=True)
-    
+
     # DVC commands
-    ctx.run(f"dvc add ./vertex_train", echo=True, pty=not WINDOWS)
-    ctx.run(f"dvc push ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
+    ctx.run("dvc add ./vertex_train", echo=True, pty=not WINDOWS)
+    ctx.run("dvc push ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
     print("Data pushed to dvc remote.")
-    
+
 
 @task
 def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
@@ -174,13 +174,13 @@ def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
 
     # Create the yq command
     yq_command = (
-        f"bash -c \"yq eval "
-        f"'.workerPoolSpecs.containerSpec.imageUri = \\\"{image_uri}\\\" | "
-        f".workerPoolSpecs.containerSpec.env[0].value = \\\"{storage_uri}\\\" | "
-        f".workerPoolSpecs.containerSpec.env[1].value = \\\"{configname}\\\"' "
-        f"{config_file} > {output_file}\""
+        f'bash -c "yq eval '
+        f'\'.workerPoolSpecs.containerSpec.imageUri = \\"{image_uri}\\" | '
+        f'.workerPoolSpecs.containerSpec.env[0].value = \\"{storage_uri}\\" | '
+        f'.workerPoolSpecs.containerSpec.env[1].value = \\"{configname}\\"\' '
+        f'{config_file} > {output_file}"'
     )
-    
+
     region = "europe-west4" if machine == "cpu" else "europe-west1"
     gcloud_command = (
         f"gcloud ai custom-jobs create "
@@ -190,7 +190,7 @@ def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
         f"--service-account=vertex-manager@pet-fac-rec.iam.gserviceaccount.com "
         f"--config={output_file} "
     )
-    
+
     ctx.run(yq_command, echo=True, pty=False)
     ctx.run(gcloud_command, echo=True, pty=False)
     ctx.run(f"rm {output_file}", echo=True, pty=False)
@@ -200,14 +200,15 @@ def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
 @task
 def gcloud_check(ctx: Context) -> None:
     """Check the status of the Vertex AI jobs."""
-    ctx.run(f"dvc pull ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
+    ctx.run("dvc pull ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
 
 
 @task
 def gcloud_login(ctx: Context) -> None:
     """Login to gcloud."""
-    ctx.run(f"gcloud auth application-default login", echo=True, pty=not WINDOWS)
-    ctx.run(f"gcloud config set project pet-fac-rec", echo=True, pty=not WINDOWS)
+    ctx.run("gcloud auth application-default login", echo=True, pty=not WINDOWS)
+    ctx.run("gcloud config set project pet-fac-rec", echo=True, pty=not WINDOWS)
+
 
 @task
 def gcloud_data_push(ctx: Context) -> None:
@@ -248,6 +249,7 @@ def runbentocontainer(ctx: Context, name: str = "bento_container") -> None:
 def build_docs(ctx: Context) -> None:
     """Build documentation."""
     ctx.run("mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS)
+
 
 @task  # Run with: invoke git --message "My commit message"
 def git(ctx, message):

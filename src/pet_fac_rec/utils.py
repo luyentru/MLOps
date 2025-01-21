@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def show_image_and_target(images, targets, show=True):
     """
     Display a grid of images with their corresponding target labels.
@@ -13,7 +14,7 @@ def show_image_and_target(images, targets, show=True):
     num_images = len(images)
     grid_size = int(np.ceil(np.sqrt(num_images)))  # Determine grid dimensions
     plt.figure(figsize=(10, 10))
-    
+
     for i in range(num_images):
         plt.subplot(grid_size, grid_size, i + 1)
         plt.imshow(images[i].squeeze(), cmap="gray")  # Squeeze in case of single-channel images
@@ -21,6 +22,6 @@ def show_image_and_target(images, targets, show=True):
         plt.axis("off")  # Hide axis ticks for cleaner visuals
 
     plt.tight_layout()
-    
+
     if show:
         plt.show()

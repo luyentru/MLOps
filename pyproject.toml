@@ -14,7 +14,7 @@ evaluate = "pet_fac_rec.evaluate:app"
 preprocess = "pet_fac_rec.data:main"
 
 [tool.pylint.MASTER]
-ignore = ["CVS"]
+lint.ignore = ["CVS"]
 persistent = true
 load-plugins = []
 
@@ -30,13 +30,13 @@ max-line-length = 120
 [tool.ruff]
 line-length = 120
 target-version = "py311"
-select = [
+lint.select = [
     "E",  # pycodestyle errors
     "F",  # pyflakes
     "I",  # isort
     "N",  # pep8-naming
 ]
-ignore = []
+lint.ignore = []
 
 [tool.ruff.format]
 quote-style = "double"

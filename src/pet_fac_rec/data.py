@@ -8,16 +8,15 @@ from typing import Tuple
 
 import kagglehub as kh
 import pandas as pd
-import typer
 import torch
+import typer
+from matplotlib import pyplot as plt
+from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-from PIL import Image
-from datetime import datetime
-from matplotlib import pyplot as plt
 
-from utils import show_image_and_target
 from pet_fac_rec.preprocessing import get_transforms
+from pet_fac_rec.utils import show_image_and_target
 
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -136,11 +135,7 @@ def preprocess(output_folder: Path) -> None:
                         data.append(
                             {
                                 "split": split,
-                                "label": label_mapping.
-                              
-                              
-                              
-                              (label_dir.name.lower(), -1),
+                                "label": label_mapping.get(label_dir.name.lower(), -1),
                                 "file_path": str(file),
                             }
                         )
