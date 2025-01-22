@@ -41,6 +41,9 @@ jobs:
           pip install -r requirements_tests.txt
           pip list
 
+      - name: Generate or download models
+        run: python tests/generate_dummy_model.py
+
       - name: Run tests & coverage
         env:
           WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
