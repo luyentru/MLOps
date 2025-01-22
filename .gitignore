@@ -14,6 +14,10 @@ lightning_logs/
 # Ignore all .png files
 *.png
 
+# Allow specific .png files in the docs folder
+!docs/source/images/architecture.png
+!docs/source/images/training_statistics.png
+
 # Ignore pretrained models
 models/
 reports/figures/
@@ -110,7 +114,7 @@ instance/
 .webassets-cache
 
 # Secret keys:
-key.json 
+key.json
 
 # Scrapy stuff:
 .scrapy
@@ -206,3 +210,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 /data
+/vertex_train
+src/pet-fac-rec/configs/experiment/

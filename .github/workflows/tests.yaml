@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - development
+  workflow_dispatch:
 
 jobs:
   test:
@@ -44,6 +45,13 @@ jobs:
         run: python tests/generate_dummy_model.py
 
       - name: Run tests & coverage
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          WANDB_PROJECT: ${{ secrets.WANDB_PROJECT }}
+          WANDB_ENTITY: ${{ secrets.WANDB_ENTITY }}
+          WANDB_ENTITY_ORG: ${{ secrets.WANDB_ENTITY_ORG }}
+          WANDB_REGISTRY: ${{ secrets.WANDB_REGISTRY }}
+          WANDB_COLLECTION: ${{ secrets.WANDB_COLLECTION }}
         run: |
           coverage run -m pytest tests/
           coverage report -m

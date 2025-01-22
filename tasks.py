@@ -1,7 +1,10 @@
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
-from invoke import Context, task
+from invoke import Context
+from invoke import task
+
 
 WINDOWS = os.name == "nt"
 PROJECT_NAME = "pet_fac_rec"
@@ -57,25 +60,25 @@ def preprocess(ctx: Context) -> None:
 
 
 @task
-def trainEffNet(ctx: Context) -> None:
+def traineffnet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
 
 
 @task
-def trainResnet(ctx: Context) -> None:
+def trainresnet(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name resnet50", echo=True, pty=not WINDOWS)
 
 
 @task
-def trainVgg(ctx: Context) -> None:
+def trainvgg(ctx: Context) -> None:
     """Train model."""
     ctx.run(f"python src/{PROJECT_NAME}/train.py --model-name vgg16", echo=True, pty=not WINDOWS)
 
 
 @task
-def evaluateEffNet(ctx: Context) -> None:
+def evaluateeffnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name efficientnet --model-checkpoint models/efficientnet.pth",
@@ -85,7 +88,7 @@ def evaluateEffNet(ctx: Context) -> None:
 
 
 @task
-def evaluateResnet(ctx: Context) -> None:
+def evaluateresnet(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name resnet50 --model-checkpoint models/resnet50.pth",
@@ -95,7 +98,7 @@ def evaluateResnet(ctx: Context) -> None:
 
 
 @task
-def evaluateVgg(ctx: Context) -> None:
+def evaluatevgg(ctx: Context) -> None:
     """Evaluate model."""
     ctx.run(
         f"python src/{PROJECT_NAME}/evaluate.py --model-name vgg16 --model-checkpoint models/vgg16.pth",
@@ -129,55 +132,160 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
 def gcloud_build_image(ctx: Context) -> None:
     """Build image in gcloud artifact registry."""
     ctx.run(
-        f"gcloud builds submit --config=cloudbuild.yaml . "
-        f"--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
+        "gcloud builds submit --config=cloudbuild.yaml . "
+        "--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
         echo=True,
         pty=not WINDOWS,
     )
 
 
 @task
-def gcloud_train(ctx, machine: str = "cpu", epochs: int = 10) -> None:
+def gcloud_queue(ctx, configname: str) -> None:
+    """
+    Queue config files for training in Vertex AI. Run before gcloud_train.
+
+    Args:
+        configname: Name of the config file.
+    """
+
+    # Create directory using os.makedirs
+    target_dir = os.path.join("vertex_train", "completed", configname)
+    os.makedirs(target_dir, exist_ok=True)
+
+    # DVC commands
+    ctx.run("dvc add ./vertex_train", echo=True, pty=not WINDOWS)
+    ctx.run("dvc push ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
+    print("Data pushed to dvc remote.")
+
+
+@task
+def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
     """
     Run a custom training job in Vertex AI using gcloud.
 
     Args:
+        configname: Name of the config file.
         machine: Machine type, such as "cpu" or "gpu".
     """
-    if machine == "gpu":
-        i = 1
-    elif machine == "cpu":
-        i = 4
-    else:
-        raise ValueError("Machine must be 'cpu' or 'gpu'.")
-    
-    command = (
-        f"gcloud ai custom-jobs create "
-        f"--region=europe-west{i} "
-        f"--display-name=test-run "
-        f"--config=config_{machine}.yaml "
-        f"--command 'python' "
-        f"--args 'src/pet_fac_rec/train.py' "
-        f"--args '--epochs' "
-        f"--args '{epochs}' "
-    )
-    ctx.run(command, echo=True, pty=not WINDOWS)
+    # Paths and variables
+    config_file = f"vertex_config/config_{machine}.yaml"
+    output_file = f"vertex_config/temp/{configname}_config_{machine}.yaml"
+    image_uri = "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train_gpu:latest"
+    storage_uri = "gs://pet-fac-rec-bucket"
 
-    
+    # Create the yq command
+    yq_command = (
+        f'bash -c "yq eval '
+        f'\'.workerPoolSpecs.containerSpec.imageUri = \\"{image_uri}\\" | '
+        f'.workerPoolSpecs.containerSpec.env[0].value = \\"{storage_uri}\\" | '
+        f'.workerPoolSpecs.containerSpec.env[1].value = \\"{configname}\\"\' '
+        f'{config_file} > {output_file}"'
+    )
+
+    region = "europe-west4" if machine == "cpu" else "europe-west1"
+    gcloud_command = (
+        f"gcloud ai custom-jobs create "
+        f"--region={region} "
+        f"--display-name={configname}-run "
+        f"--enable-web-access "
+        f"--service-account=vertex-manager@pet-fac-rec.iam.gserviceaccount.com "
+        f"--config={output_file} "
+    )
+
+    ctx.run(yq_command, echo=True, pty=False)
+    ctx.run(gcloud_command, echo=True, pty=False)
+    ctx.run(f"rm {output_file}", echo=True, pty=False)
+    print("Training job submitted successfully.")
+
+
+@task
+def gcloud_check(ctx: Context) -> None:
+    """Check the status of the Vertex AI jobs."""
+    ctx.run("dvc pull ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
+
+
 @task
 def gcloud_login(ctx: Context) -> None:
     """Login to gcloud."""
-    ctx.run(f"gcloud auth application-default login", echo=True, pty=not WINDOWS)
-    
-        
+    ctx.run("gcloud auth application-default login", echo=True, pty=not WINDOWS)
+    ctx.run("gcloud config set project pet-fac-rec", echo=True, pty=not WINDOWS)
+
+
 @task
-def gcloud_dvc_push(ctx: Context) -> None:
+def gcloud_data_push(ctx: Context) -> None:
     """Push data to dvc remote."""
-    ctx.run(f"dvc add ./data/")
-    ctx.run(f"git add ./data.dvc")
-    ctx.run(f"dvc push --no-run-cache", echo=True, pty=not WINDOWS)
-    
-    
+    ctx.run("dvc add ./data/")
+    ctx.run("git add ./data.dvc")
+    ctx.run("dvc push --no-run-cache", echo=True, pty=not WINDOWS)
+
+
+# Backend Tasks
+
+
+@task
+def loadbentomodel(ctx: Context) -> None:
+    """Load .onnx model into bento"""
+    ctx.run("python bentoml_api/src/load_model.py")
+
+
+@task
+def runbento(ctx: Context) -> None:
+    """Start a bentoml server"""
+    with ctx.cd("bentoml_api"):
+        ctx.run("bentoml build")
+        ctx.run("bentoml serve src.service:svc --reload")
+
+
+@task
+def buildbentoimage(ctx: Context) -> None:
+    """Build a docker image for a bentoml API"""
+    ctx.run("docker build -t bento-image -f dockerfiles/bento.dockerfile .")
+
+
+@task
+def runbentocontainer(ctx: Context, name: str = "backend") -> None:
+    """Run bento API as docker container. Access locally via localhost:8080. Args: name (str): Docker Container Name"""
+    ctx.run(f"docker run -p 8080:5000 --name {name} bento-image")
+
+
+# Frontend Tasks
+
+
+@task
+def buildstreamlitimage(ctx: Context) -> None:
+    """Build a docker image for the streamlit frontend"""
+    ctx.run("docker build -t frontend-image -f dockerfiles/frontend.dockerfile .")
+
+
+@task
+def runstreamlitcontainer(ctx: Context, name: str = "frontend") -> None:
+    """Run a container with the streamlit frontend, accessible via localhost:9000"""
+    ctx.run(f"docker run -p 9000:9000 --name {name} frontend-image")
+
+
+# Run Frontend and Backend in one Network
+# Make sure to delete any containers named "frontend" or "backend" before running
+@task
+def runfrontendbackend(ctx: Context) -> None:
+    # Create Docker Network
+    ctx.run("docker network create pet_fac_network")
+
+    # Run Backend Tasks
+    def run_backend():
+        ctx.run("docker build -t bento-image -f dockerfiles/bento.dockerfile .")
+        ctx.run("docker run --name backend --network pet_fac_network bento-image")
+
+    # Run Frontend Tasks
+    def run_frontend():
+        ctx.run("docker build -t frontend-image -f dockerfiles/frontend.dockerfile .")
+        ctx.run("docker run -p 9000:9000 --name frontend --network pet_fac_network frontend-image")
+
+    # Run Backend and Frontend in parallel
+    with ThreadPoolExecutor() as executor:
+        executor.submit(run_backend)
+        executor.submit(run_frontend)
+
+
 # Documentation commands
 @task(dev_requirements)
 def build_docs(ctx: Context) -> None:

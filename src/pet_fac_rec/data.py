@@ -1,18 +1,31 @@
-from pathlib import Path
 import logging
-import pandas as pd
-import kagglehub as kh
+import os
 import shutil
-from typing import Optional, Tuple
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+from typing import Tuple
+
+import kagglehub as kh
+import pandas as pd
+import torch
 import typer
+from matplotlib import pyplot as plt
+from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-from PIL import Image
-from datetime import datetime
+
+from pet_fac_rec.preprocessing import get_transforms
+from pet_fac_rec.utils import show_image_and_target
+
 
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+os.makedirs("reports/logs", exist_ok=True)
 logging.basicConfig(filename=f"reports/logs/{current_time}.log", level=logging.INFO)
 log = logging.getLogger(__name__)
+
+# define image classes
+label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
 
 class MyDataset(Dataset):
@@ -31,8 +44,11 @@ class MyDataset(Dataset):
         self.data = pd.read_csv(csv_file)
         self.data = self.data[self.data["split"] == split]
         self.labels = self.data["label"].unique()
+        self.name = split
+        self.images = list(self.data["file_path"])
+        self.target = torch.tensor(self.data["label"].values, dtype=torch.long)
         self.num_classes = len(self.labels)
-        self.transform = transform
+        self.transform = transform or get_transforms()
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
@@ -105,7 +121,6 @@ def preprocess(output_folder: Path) -> None:
 
     # Walk through each subdirectory and file to create a data list
     data = []
-    label_mapping = {"happy": 0, "sad": 1, "angry": 2, "other": 3}
 
     for split in ["train", "valid", "test"]:
         split_path = output_folder / split
@@ -132,15 +147,38 @@ def preprocess(output_folder: Path) -> None:
     log.info(f"Data saved to CSV at: {csv_path}")
 
 
-def get_default_transforms() -> transforms.Compose:
-    """Return default transformations for the dataset."""
-    return transforms.Compose(
-        [
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
+def dataset_statistics(datadir: str = "data/data.csv") -> None:
+    """Compute dataset statistics."""
+    train_dataset = MyDataset(csv_file=Path(datadir), split="train")
+    test_dataset = MyDataset(csv_file=Path(datadir), split="test")
+    print(f"Train dataset: {train_dataset.name}")
+    print(f"Number of images: {len(train_dataset)}")
+    print(f"Image shape: {train_dataset[0][0].shape}")
+    print("\n")
+    print(f"Test dataset: {test_dataset.name}")
+    print(f"Number of images: {len(test_dataset)}")
+    print(f"Image shape: {test_dataset[0][0].shape}")
+
+    show_image_and_target(train_dataset.images[:25], train_dataset.target[:25], show=False)
+    plt.savefig("pet_facial_expressions.png")
+    plt.close()
+
+    train_label_distribution = torch.bincount(train_dataset.target)
+    test_label_distribution = torch.bincount(test_dataset.target)
+
+    plt.bar(torch.arange(10), train_label_distribution)
+    plt.title("Train label distribution")
+    plt.xlabel("Label")
+    plt.ylabel("Count")
+    plt.savefig("train_label_distribution.png")
+    plt.close()
+
+    plt.bar(torch.arange(10), test_label_distribution)
+    plt.title("Test label distribution")
+    plt.xlabel("Label")
+    plt.ylabel("Count")
+    plt.savefig("test_label_distribution.png")
+    plt.close()
 
 
 def main():
