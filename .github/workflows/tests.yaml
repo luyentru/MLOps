@@ -40,6 +40,9 @@ jobs:
           pip install -r requirements_tests.txt
           pip list
 
+      - name: Generate or download models
+        run: python tests/generate_dummy_model.py
+
       - name: Run tests & coverage
         run: |
           coverage run -m pytest tests/
