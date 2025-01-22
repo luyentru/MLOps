@@ -11,7 +11,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy necessary files
-COPY requirements.txt pyproject.toml README.md ./
+COPY requirements_bentoapi.txt pyproject.toml README.md ./
 COPY src/ src/
 COPY data/ data/
 COPY reports/ reports/
@@ -20,7 +20,7 @@ COPY models/ models/
 
 # Install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_bentoapi.txt
 RUN pip install -e .
 
 # Set work directory to root directory to load the model
@@ -32,4 +32,5 @@ WORKDIR /app/bentoml_api
 RUN bentoml build
 
 # Set the entrypoint to serve the BentoML service
+EXPOSE 5000
 ENTRYPOINT ["bentoml", "serve", "src.service:svc", "--reload", "--host", "0.0.0.0", "--port", "5000"]
