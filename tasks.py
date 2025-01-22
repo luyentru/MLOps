@@ -1,6 +1,8 @@
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
+import warnings
+from pathlib import Path
 
 from invoke import Context
 from invoke import task
@@ -11,6 +13,21 @@ PROJECT_NAME = "pet_fac_rec"
 PYTHON_VERSION = "3.11"
 
 
+# Helper functions
+def check_directory_contents(directory_path: str, num_items: int = 0) -> bool:
+    """
+    Check if directory has the same number of items than specified threshold.
+    Returns True if safe to proceed, False if not.
+    """
+    if not os.path.exists(directory_path):
+        return False
+        
+    items = os.listdir(directory_path)
+    if len(items) == num_items:
+        return False
+    return True
+
+ 
 # Setup commands
 @task
 def create_environment(ctx: Context) -> None:
@@ -140,17 +157,19 @@ def gcloud_build_image(ctx: Context) -> None:
 
 
 @task
-def gcloud_queue(ctx, configname: str) -> None:
+def gcloud_queue(ctx,) -> None:
     """
-    Queue config files for training in Vertex AI. Run before gcloud_train.
+    Queue config files for training in Vertex AI. Run before gcloud_train. Only 1 file can be queued at a time.
 
     Args:
         configname: Name of the config file.
     """
-
-    # Create directory using os.makedirs
-    target_dir = os.path.join("vertex_train", "completed", configname)
-    os.makedirs(target_dir, exist_ok=True)
+    
+    # Add early return if directory check fails
+    queue_dir = os.path.join("vertex_train", "queue")
+    if check_directory_contents(queue_dir, num_items=2):
+        warnings.warn("Directory has too many files. Please run gcloud-train first.")
+        return
 
     # DVC commands
     ctx.run("dvc add ./vertex_train", echo=True, pty=not WINDOWS)
@@ -159,7 +178,7 @@ def gcloud_queue(ctx, configname: str) -> None:
 
 
 @task
-def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
+def gcloud_train(ctx, machine: str = "gpu") -> None:
     """
     Run a custom training job in Vertex AI using gcloud.
 
@@ -167,34 +186,21 @@ def gcloud_train(ctx, configname: str, machine: str = "gpu") -> None:
         configname: Name of the config file.
         machine: Machine type, such as "cpu" or "gpu".
     """
-    # Paths and variables
-    config_file = f"vertex_config/config_{machine}.yaml"
-    output_file = f"vertex_config/temp/{configname}_config_{machine}.yaml"
-    image_uri = "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train_gpu:latest"
-    storage_uri = "gs://pet-fac-rec-bucket"
 
-    # Create the yq command
-    yq_command = (
-        f'bash -c "yq eval '
-        f'\'.workerPoolSpecs.containerSpec.imageUri = \\"{image_uri}\\" | '
-        f'.workerPoolSpecs.containerSpec.env[0].value = \\"{storage_uri}\\" | '
-        f'.workerPoolSpecs.containerSpec.env[1].value = \\"{configname}\\"\' '
-        f'{config_file} > {output_file}"'
+    # Add early return if directory check fails
+    ctx.run("dvc pull ./vertex_train --no-run-cache")
+    queue_dir = os.path.join("vertex_train", "queue")
+    if not check_directory_contents(queue_dir, num_items=0):
+        warnings.warn("No training job queued. Please run gcloud-queue first.")
+        return
+    
+    # Submit build
+    ctx.run(
+        "gcloud builds submit --config=cloudbuild.yaml . "
+        "--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
+        echo=True,
+        pty=not WINDOWS,
     )
-
-    region = "europe-west4" if machine == "cpu" else "europe-west1"
-    gcloud_command = (
-        f"gcloud ai custom-jobs create "
-        f"--region={region} "
-        f"--display-name={configname}-run "
-        f"--enable-web-access "
-        f"--service-account=vertex-manager@pet-fac-rec.iam.gserviceaccount.com "
-        f"--config={output_file} "
-    )
-
-    ctx.run(yq_command, echo=True, pty=False)
-    ctx.run(gcloud_command, echo=True, pty=False)
-    ctx.run(f"rm {output_file}", echo=True, pty=False)
     print("Training job submitted successfully.")
 
 

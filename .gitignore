@@ -211,4 +211,4 @@ cython_debug/
 #.idea/
 /data
 /vertex_train
-src/pet-fac-rec/configs/experiment/
+.env

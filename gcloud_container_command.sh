@@ -4,36 +4,50 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Check required environment variables
-if [ -z "${STORAGE_URI:-}" ]; then
-    echo "Error: STORAGE_URI environment variable is not set"
-    exit 1
-fi
-
-if [ -z "${CONFIG_NAME:-}" ]; then
-    echo "Error: CONFIG_NAME environment variable is not set"
-    exit 1
-fi
+# # Check required environment variables
+# if [ -z "${GOOGLE_APPLICATION_CREDENTIALS_JSON:-}" ]; then
+#     echo "Error: GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set"
+#     exit 1
+# fi
 
 # Create required directories
-mkdir -p /reports/logs
-mkdir -p /reports/figures
-mkdir -p /models
+mkdir -p ./reports/logs
+mkdir -p ./reports/figures
+mkdir -p ./models
+mkdir -p ./vertex_train/queue
+mkdir -p ./vertex_train/completed
 
-# Copy config file
-gsutil cp "${STORAGE_URI}/vertex_train/queue/${CONFIG_NAME}.yaml" /src/pet_fac_rec/configs/experiment/
+# Initialize DVC and configure remote
+dvc init --no-scm || { echo "DVC initialization failed"; exit 1; }
+dvc remote add -d pet-fac-rec-bucket gs://pet-fac-rec-bucket/
+# dvc remote modify pet-fac-rec-bucket credentialpath /tmp/gcp-credentials.json
 
-# Copy data
-gsutil -m cp -r "${STORAGE_URI}/data" /
+# Pull .dvc files from git
+git clone https://${GITHUB_TOKEN}@https://github.com/luyentru/MLOps/tree/dvc_revisions /workspace
+cd /workspace
+
+# Pull data using DVC
+dvc pull || { echo "DVC pull failed"; exit 1; }
+dvc status || { echo "DVC status check failed"; exit 1; }
+
+# Move a config file from queue to configs
+CONFIG_FILE=$(find ./vertex_train/queue -type f | head -n 1)
+if [ -z "$CONFIG_FILE" ]; then
+  echo "No config file found in ./vertex_train/queue."
+  exit 1
+fi
+mv "$CONFIG_FILE" ./src/pet_fac_rec/configs/experiment/
+
+# Create output folder
+FILENAME=$(basename "$CONFIG_FILE" .yaml)
+mkdir -p "./vertex_train/completed/${FILENAME}"
 
 # Run training
-python3.11 -u src/pet_fac_rec/train.py experiment="${CONFIG_NAME}"
+python3.11 -u src/pet_fac_rec/train.py experiment="${FILENAME}"
 
-# Copy logs and models to completed folder
-gsutil cp -r /reports/logs "${STORAGE_URI}/vertex_train/completed/${CONFIG_NAME}/logs"
-gsutil cp -r /reports/figures "${STORAGE_URI}/vertex_train/completed/${CONFIG_NAME}/figures"
-gsutil cp -r /models "${STORAGE_URI}/vertex_train/completed/${CONFIG_NAME}/models"
+# Move logs and models to completed folder
+mv /reports/logs/* /reports/figures/* /src/pet_fac_rec/configs/* /models/* /vertex_train/completed/"${FILENAME}"/
 
-# Copy and remove config file
-gsutil cp "${STORAGE_URI}/vertex_train/queue/${CONFIG_NAME}.yaml" "${STORAGE_URI}/vertex_train/completed/${CONFIG_NAME}/"
-gsutil rm "${STORAGE_URI}/vertex_train/queue/${CONFIG_NAME}.yaml"
+# Push data using DVC
+dvc add ./vertex_train/
+dvc push
