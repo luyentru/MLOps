@@ -823,7 +823,17 @@ Afterwards, we started one docker container for each image in Cloud Run. ---
 
 > Answer:
 
---- question 29 fill here ---
+--- The architecture can be found here: 
+```markdown
+![architecture](figures/architecture.png)
+```
+The starting point of our diagram is the code which we have access to through our local setup. It accesses the data from the remote gcloud bucket through DVC and tracks its changes. To manage the configurations of our model, we used hydra, which also ensures reproducibility. The model training itself is logged using weights and biases to monitor all the experiments and results. 
+
+The code gets commited and pushed onto our GitHub repository with implemented pre-commits. There are several unit, integration, and performance tests implemented, which get triggered and executed through the workflows using GitHub Actions. This helps maintain the code quality and correctness. Docker images are build as well,  which are then stored in a container registry. 
+
+There are two APIs that can do inference on the trained model, namely FastAPI and BentoML. The user has three main ways to access and use the model. They can either clone the code itself from our GitHub repository, they can pull the docker images, or they can access the model through the frontend interface of our BentoML API which was build using Streamlit. 
+
+Overall, we tried to implement all main aspects of the course and our pipeline integrates the data management, configuration, CI/CD, containerization and user interaction. ---
 
 ### Question 30
 
