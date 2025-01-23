@@ -214,7 +214,7 @@ are using (M2+M6)
 
 > Answer:
 
---- For the project, we chose to work with torchvision, a package not covered extensively in our course. Torchvision is part of the PyTorch ecosystem and offers a range of pre-trained models, including EfficientNet, ResNet, and VGG, which we utilized to significantly expedite our model development process. By leveraging these pre-trained models, we were able to implement state-of-the-art architectures for our tasks without having to train them from scratch, which saved us a lot of time. Due to limited time, we only managed to fine-tune the pretrained EffiecientNet model. The model was well suited for our problem.---
+--- For the project, we chose to work with the third-party framework torchvision, which is a package that is not covered extensively in our course. Torchvision is a part of the PyTorch ecosystem and offers a range of pre-trained models, including EfficientNet, ResNet, and VGG, which we utilized to significantly expedite our model development process. By leveraging these pre-trained models, we were able to implement state-of-the-art architectures for our tasks without having to train them from scratch, which saved us a lot of time. Due to limited time, we only managed to fine-tune the pretrained EffiecientNet model. The model was well suited for our problem. ---
 
 ## Coding environment
 
@@ -245,6 +245,9 @@ are using (M2+M6)
 - `requirements.txt` for core production dependencies
 - `requirements_dev.txt` for development tools (linters, formatters)
 - `requirements_tests.txt` for testing frameworks and tools
+- `requirements_bentoapi.txt` for the backend API tools
+- `requirements_frontend.txt` for the frontend tools
+- `requirements_gpu.txt` for VertexAI training
 
 New team members should follow these steps to set up their environment:
 
@@ -319,9 +322,7 @@ These practices matter in larger projects because:
 - Consistent formatting makes code more readable and maintainable across a team
 - Type hints catch errors early and serve as inline documentation
 - Documentation helps new team members understand the codebase quickly
-- Automated quality checks prevent issues from being merged into the main codebase
-
----
+- Automated quality checks prevent issues from being merged into the main codebase ---
 
 ## Version control
 
@@ -347,8 +348,7 @@ These practices matter in larger projects because:
 
 > Answer:
 
---- 
-In total we implemented 5 tests. `test_model_speed` validates the continuous integration workflow on GitHub; `test_dataset_download` ensures the functionality of dataset handling; `test_efficientnet_model_init` checks that the initialized model has the correct number of output classes; `test_efficientnet_forward_pass` verifies the model's forward pass by creating a sample input and running it through the model; and `test_efficientnet_pretrained_parameter` checks both the pretrained and non-pretrained initialization options of the model. ---
+--- In total we implemented 5 tests. `test_model_speed` validates the continuous integration workflow on GitHub; `test_dataset_download` ensures the functionality of dataset handling; `test_efficientnet_model_init` checks that the initialized model has the correct number of output classes; `test_efficientnet_forward_pass` verifies the model's forward pass by creating a sample input and running it through the model; and `test_efficientnet_pretrained_parameter` checks both the pretrained and non-pretrained initialization options of the model. ---
 
 ### Question 8
 
@@ -372,7 +372,7 @@ In total we implemented 5 tests. `test_model_speed` validates the continuous int
 
 --- The total coverage of our code is 12% as calculated by ‘coverage report’. Some of our files have higher coverage like api.py with 84% (we tested this one extensively as part of the API testing exercise), but others have very little coverage. This is fine, as we could easily write more unit tests to increase the code coverage.
 
-Even with 100% code coverage we can however not be sure that the code works together, as the tests might miss scenarios that are relevant or the integration of different units is not working. It is therefore a good way to increase security, but it is not a guarantee for bug-free code.  ---
+Even with 100% code coverage we can however not be sure that the code works together, as the tests might miss scenarios that are relevant or the integration of different units is not working. It is therefore a good way to increase security, but it is not a guarantee for bug-free code. ---
 
 ### Question 9
 
@@ -418,7 +418,7 @@ The `main` branch contains all production-ready code. We push only from `develop
 
 > Answer:
 
---- Yes, DVC was used to sync our local data with the remote storage in the gcloud bucket. It allowed us to sync data changes to those in the bucket, which was what we used for training on Vertex AI. This enabled us to decouple the data from the training images, avoiding the need to rebuild the training image each time the data was updated. However, we encountered problems while puling data into new environments using dvc pull, as there was an issue with the cache being out of sync. While the implementation of DVC did not improve our project by much due to there being no changes to our data, it provides a robust solution for continuous development of models in a production environment with dynamic datasets. ---
+--- Yes, DVC was used to sync our local data with the remote storage in the gcloud bucket. It allowed us to sync data changes to those in the bucket, which was what we used for training on Vertex AI. This enabled us to decouple the data from the training images, avoiding the need to rebuild the training image each time the data was updated. However, we encountered problems while puling data into new environments using `dvc pull`, as there was an issue with the cache being out of sync. While the implementation of DVC did not improve our project by much due to there being no changes to our data, it provides a robust solution for continuous development of models in a production environment with dynamic datasets. ---
 
 ### Question 11
 
@@ -474,7 +474,7 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 
 --- We keep our config files in a folder `src/pet_fac_rec/configs`. It has a main `config.yaml` where we define default experiment and an experiments subfolder for each specific setup. These files set stuff like learning rate, batch size, epochs, dropout, a fixed seed for consistency, and the path for training data. To run an experiment, there are several ways, below is one example: 
 
-`python src/pet_fac_rec/train.py experiment=exp1`---
+`python src/pet_fac_rec/train.py experiment=exp1` ---
 
 ### Question 13
 
@@ -553,9 +553,7 @@ Our API container is configured to serve the FastAPI application on port 8000, m
 - docker build -f dockerfiles/api.dockerfile -t api_container .
 - docker run -p 8000:8000 api_container
 
-Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfiles/train.dockerfile
-
----
+Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfiles/train.dockerfile ---
 
 ### Question 16
 
@@ -575,7 +573,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- When running into a bug, we first observed the error-message displayed in the terminal. At most times it was an easy, straight-forward fix through observation of where the error originated. If that didn’t help we added print-statements, or asked ChatGPT/GitHub Copilot for help. Lastly, we looked into the documentation of the package/function where the error originated or looked on Slack if someone had a similar issue. If the error only existed for one person, we talked to our group members and tried to fix the issue together. We did profile our code but we did not work thoroughly on the optimization, as our model implementation is quite straight-forward and the optimization was not our main priority.  ---
+--- When running into a bug, we first observed the error-message displayed in the terminal. At most times it was an easy, straight-forward fix through observation of where the error originated. If that didn’t help we added print-statements, or asked ChatGPT/GitHub Copilot for help. Lastly, we looked into the documentation of the package/function where the error originated or looked on Slack if someone had a similar issue. If the error only existed for one person, we talked to our group members and tried to fix the issue together. We did profile our code but we did not work thoroughly on the optimization, as our model implementation is quite straight-forward and the optimization was not our main priority. ---
 
 ## Working in the cloud
 
@@ -738,7 +736,7 @@ After that, we started one docker container for each image in Cloud Run. ---
 
 > Answer:
 
---- We implemented both unit testing and load testing for our FastAPI implementation to ensure its reliability. For unit testing, we used FrastAPI’s test client along with a test image that was randomly chosen by us out of the test set. For load testing, we used the locust framework with http-users to simulate traffic and the same test image for consistency. Our load testing confirmed that the API worked for up to 20 users (with a spawn rate of three), but we did not test the API until it crashed. We could test that by increasing the number of users and increasing the spawn rate until the API reaches its breaking point.   ---
+--- We implemented both unit testing and load testing for our FastAPI implementation to ensure its reliability. For unit testing, we used FrastAPI’s test client along with a test image that was randomly chosen by us out of the test set. For load testing, we used the locust framework with http-users to simulate traffic and the same test image for consistency. Our load testing confirmed that the API worked for up to 20 users (with a spawn rate of three), but we did not test the API until it crashed. We could test that by increasing the number of users and increasing the spawn rate until the API reaches its breaking point. ---
 
 ### Question 26
 
