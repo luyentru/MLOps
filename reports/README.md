@@ -240,7 +240,7 @@ are using (M2+M6)
 
 > Answer:
 
---- Our project manages dependencies using pip and the invoke task runner. Dependencies are organized in three requirements files:
+--- Our project manages dependencies using pip and the invoke task runner. Dependencies are organized in six requirements files:
 
 - `requirements.txt` for core production dependencies
 - `requirements_dev.txt` for development tools (linters, formatters)
@@ -253,7 +253,7 @@ New team members should follow these steps to set up their environment:
 
 1.  Install Miniconda from https://docs.conda.io/miniconda.html
 2.  Clone the repository and navigate to the project root
-3.  Create and activate a new conda environment: `invoke create_environment`, `conda activate pat_fac_rec`
+3.  Create and activate a new conda environment: `invoke create_environment`, `conda activate pet_fac_rec`
 4.  Install all dependencies: `invoke requirements`, `invoke dev-requirements`
 
 This ensures an identical development environment across the team. The invoke tasks handle the installation order and dependencies between the requirements files.
@@ -278,7 +278,7 @@ We use pip-tools to maintain dependencies, making it easy to update packages whi
 
 > Answer:
 
---- We used most of the directories and files from the cookiecutter template to structure our project. Initially, we used the data-folder for local data-storage, until we used the GCP bucket linked with the DVC for data management. We adapted the data-storage structure by removing the processed/raw-folders and replacing them with test/train/valid folders to store the data. Moreover, we removed the notebooks-folder as we did not use any Jupyter notebooks for our project. To store experiment configurations, we added a config-directory within the src-folder to separate the configuration files from the code. We also added sub-folders in the tests-directory to structure our tests into unittests, and integrationtests. Lastly, we added a requirements_tests.txt for the testing frameworks and tools. Therefore, we retained most aspects from the template but made small adjustments to fit the structure of our repository to the project's organization. ---
+--- We used most of the directories and files from the cookiecutter template to structure our project. Initially, we used the data-folder for local data-storage, until we used the GCP bucket linked with the DVC for data management. We adapted the data-storage structure by removing the processed/raw-folders and replacing them with test/train/valid folders to store the data. Moreover, we removed the notebooks-folder as we did not use any Jupyter notebooks for our project. To store experiment configurations, we added a config-directory within the src-folder to separate the configuration files from the code. We also added sub-folders in the tests-directory to structure our tests into unit tests, performance tests and integration tests. Lastly, we added several requirement files for the different frameworks and tools. Therefore, we retained most aspects from the template but made small adjustments to fit the structure of our repository to the project's organization. ---
 
 ### Question 6
 
@@ -304,7 +304,7 @@ We use pip-tools to maintain dependencies, making it easy to update packages whi
 
 - `ruff` for both linting and formatting (configured in .pre-commit-config.yaml)
 - Enforces a line length of 120 characters (specified in pyproject.toml)
-- GitHub Actions workflow runs pylint with a minimum score requirement of 8.0
+- GitHub Actions workflow runs pylint with a minimum score requirement of 7.5
 - Pre-commit hooks check for trailing whitespace, file endings, and YAML/JSON validity
 
 2.  **Type Annotations**:
@@ -418,7 +418,7 @@ The `main` branch contains all production-ready code. We push only from `develop
 
 > Answer:
 
---- Yes, DVC was used to sync our local data with the remote storage in the gcloud bucket. It allowed us to sync data changes to those in the bucket, which was what we used for training on Vertex AI. This enabled us to decouple the data from the training images, avoiding the need to rebuild the training image each time the data was updated. However, we encountered problems while puling data into new environments using `dvc pull`, as there was an issue with the cache being out of sync. While the implementation of DVC did not improve our project by much due to there being no changes to our data, it provides a robust solution for continuous development of models in a production environment with dynamic datasets. ---
+--- Yes, DVC was used to sync our local data with the remote storage in the gcloud bucket. It allowed us to sync data changes to those in the bucket, which was what we used for training on Vertex AI. This enabled us to decouple the data from the training images, avoiding the need to rebuild the training image each time the data was updated. However, we encountered problems while pulling data into new environments using `dvc pull`, as there was an issue with the cache being out of sync. While the implementation of DVC did not improve our project by much due to there being no changes to our data, it provides a robust solution for continuous development of models in a production environment with dynamic datasets. ---
 
 ### Question 11
 
@@ -472,7 +472,7 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 
 > Answer:
 
---- We keep our config files in a folder `src/pet_fac_rec/configs`. It has a main `config.yaml` where we define default experiment and an experiments subfolder for each specific setup. These files set stuff like learning rate, batch size, epochs, dropout, a fixed seed for consistency, and the path for training data. To run an experiment, there are several ways, below is one example: 
+--- We keep our config files in a folder `src/pet_fac_rec/configs`. It has a main `config.yaml` where we define default experiment and an experiments subfolder for each specific setup. These files set parameters like learning rate, batch size, epochs, dropout, a fixed seed for consistency, and the path for training data. To run an experiment, there are several ways, below is one example: 
 
 `python src/pet_fac_rec/train.py experiment=exp1` ---
 
@@ -515,7 +515,7 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 > Answer:
 
 --- We had to manually adjust hyperparameters as we could not set up the Wandb sweeping to work with Hydra. We created and ran eight distinct experiments and monitored each one in the Wandb web interface. In the figure, you can see we logged training and validation losses, as well as accuracies for each run of the experiment. Training and validation loss track the model's learning process, with a decreasing value indicating the model's ability to learn over time, while accuracy gave us a clear picture of whether it was actually getting better at making the right predictions. Some models showed clear signs of both overfitting and underfitting. From the eight experiments, we selected the model with the highest validation accuracy and evaluated it on the test dataset, yielding around 40% accuracy, which is relatively low and indicates substantial room for improvement.
-Future work could benefit from more advanced techniques like Bayesian optimization or automated sweeps. The bad performance could also be attributed to the training dataset size. It contains only 1075 training samples, so expanding the dataset by gathering additional images could significantly improve model performance and generalization.Lastly, implementing image augmentation techniques could help increase the effective size and diversity of our training data. 
+Future work could benefit from more advanced techniques like Bayesian optimization or automated sweeps. The bad performance could also be attributed to the training dataset size. It contains only 1075 training samples, so expanding the dataset by gathering additional images could significantly improve model performance and generalization. Lastly, implementing image augmentation techniques could help increase the effective size and diversity of our training data. 
 
 ![screenshot](figures/wandb.png) ---
 
@@ -862,7 +862,7 @@ Overall, we tried to implement all main aspects of the course and our pipeline i
 
 --- One major struggle we had was getting the different containers to communicate with each other. Locally, the frontend would send requests to localhost:5000, but as soon as we deployed to the cloud, that would not work anymore. We ended up with a version that would try to fetch a API URL for a backend container if available on the cloud and return the localhost:5000 otherwise. This way, our code is able to create working container set-ups locally and in the cloud.
 
-A challenge we faced was with setting up dvc to sync correctly, as the data was unable to be pulled into a new environment even with the correct dvc file being imported, citing a cache mismatch. This prompted a workaround using gsutil copy for our Vertex AI runs to inject the data for training. This, combined with the hard-to-iterate nature of the cloud setup made debugging very slow. Any update made to the training code, requirements, or entrypoint bash script required a new image to be built, debugged on console, then deployed on vertex which incurred long wait times. This necessitated an approach where changes had to be checked thoroughly before being tested on the cloud to minimize iterating. 
+Another challenge we faced was with setting up DVC to sync correctly, as the data was unable to be pulled into a new environment even with the correct dvc file being imported, citing a cache mismatch. This prompted a workaround using gsutil copy for our Vertex AI runs to inject the data for training. This, combined with the hard-to-iterate nature of the cloud setup made debugging very slow. Any update made to the training code, requirements, or entrypoint bash script required a new image to be built, debugged on console, then deployed on vertex which incurred long wait times. This necessitated an approach where changes had to be checked thoroughly before being tested on the cloud to minimize iterating. 
 
 While reviewing the initial project description, we found that the plan was to focus more on the model and improving its performance, but more time was spent on setting up the infrastructure around the model than expected.  ---
 
