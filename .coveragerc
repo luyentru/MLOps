@@ -1,0 +1,5 @@
+[run]
+source =
+    src/pet_fac_rec
+omit =
+    tests/*

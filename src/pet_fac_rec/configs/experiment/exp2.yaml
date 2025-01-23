@@ -1,0 +1,6 @@
+lr: 0.1
+batch_size: 8
+epochs: 1
+dropout: 0.3
+data_csv: "data/data.csv"
+seed: 42

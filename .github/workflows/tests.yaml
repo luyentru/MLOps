@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - main
+      - development
   pull_request:
     branches:
       - main
+      - development
+  workflow_dispatch:
 
 jobs:
   test:
@@ -14,7 +17,7 @@ jobs:
     strategy:
       matrix:
         operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.12", "3.11"]
+        python-version: ["3.11"]
 
     steps:
       - name: Checkout code
@@ -24,17 +27,31 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: setup.py
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements_dev.txt
+            requirements_tests.txt
 
       - name: Install dependencies
         run: |
           python -m pip install -U pip setuptools wheel
           pip install -r requirements.txt
+          pip install -r requirements_dev.txt
+          pip install -r requirements_tests.txt
           pip list
 
+      - name: Generate or download models
+        run: python tests/generate_dummy_model.py
 
       - name: Run tests & coverage
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          WANDB_PROJECT: ${{ secrets.WANDB_PROJECT }}
+          WANDB_ENTITY: ${{ secrets.WANDB_ENTITY }}
+          WANDB_ENTITY_ORG: ${{ secrets.WANDB_ENTITY_ORG }}
+          WANDB_REGISTRY: ${{ secrets.WANDB_REGISTRY }}
+          WANDB_COLLECTION: ${{ secrets.WANDB_COLLECTION }}
         run: |
           coverage run -m pytest tests/
           coverage report -m

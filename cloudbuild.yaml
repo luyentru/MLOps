@@ -1,0 +1,29 @@
+steps:
+- name: 'ubuntu'
+  id: 'Verify build context'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - 'ls -laR'
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build container image'
+  args: [
+    'build',
+    '.',
+    '-t',
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/pet-fac-rec-image-storage/$_IMAGE_NAME',
+    '-f',
+    'dockerfiles/train_gcloud.dockerfile'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push container image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/pet-fac-rec-image-storage/$_IMAGE_NAME'
+  ]
+options:
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - DOCKER_BUILDKIT=1
+substitutions:
+  _IMAGE_NAME: 'train_gpu'
