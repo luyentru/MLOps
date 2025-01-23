@@ -1,4 +1,0 @@
-[core]
-    remote = pet-fac-rec-bucket
-['remote "pet-fac-rec-bucket"']
-    url = gs://pet-fac-rec-bucket/
