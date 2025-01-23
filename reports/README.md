@@ -757,7 +757,15 @@ Afterwards, we started one docker container for each image in Cloud Run. ---
 
 > Answer:
 
---- question 26 fill here ---
+--- We have implemented some monitoring for our API. We implemented 3 metrics in our service.py file: 
+
+1. prediction_counter: Counts how many predictions were created since the container has been started
+2. error_counter: Counts how many errors occurred when inferring from the model since the container has been started
+3. prediction_latency: Returns the average time it takes the API to return a model inference
+
+All metrics are imported via ‘prometheus_client’. The counters are set to increase in relevant parts of the code, while the prediction_latency is calculated by enclosing the prediction function into a ‘with prediction_latency.time(): wrapper which calculates the time until this part of the code has been executed. 
+ 
+The metrics (along with some standard metrics) can be obtained publicly via our API endpoint (if our container is still running at this point) via:  https://backend-bento-73164234676.europe-west1.run.app/metrics ---
 
 ## Overall discussion of project
 
