@@ -572,7 +572,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 16 fill here ---
+--- When running into a bug, we first observed the error-message displayed in the terminal. At most times it was an easy, straight-forward fix through observation of where the error originated. If that didn’t help we added print-statements, or asked ChatGPT/GitHub Copilot for help. Lastly, we looked into the documentation of the package/function where the error originated or looked on Slack if someone had a similar issue. If the error only existed for one person, we talked to our group members and tried to fix the issue together. We did profile our code but we did not work thoroughly on the optimization, as our model implementation is quite straight-forward and the optimization was not our main priority.  ---
 
 ## Working in the cloud
 
