@@ -8,6 +8,8 @@ workerPoolSpecs:
     containerSpec:
         imageUri: "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train_gpu:latest"
         env:
+        - name: STORAGE_URI
+          value: gs://pet-fac-rec-bucket
         - name: WANDB_PROJECT
           value: pet_fac_rec
         - name: WANDB_ENTITY
@@ -20,5 +22,3 @@ workerPoolSpecs:
           value: pet-fac-rec-model
         - name: WANDB_API_KEY
           value: $WANDB_API_KEY
-        - name: GITHUB_TOKEN
-          value: $GITHUB_TOKEN

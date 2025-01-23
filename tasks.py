@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 from concurrent.futures import ThreadPoolExecutor
 import warnings
 from pathlib import Path
@@ -27,7 +28,57 @@ def check_directory_contents(directory_path: str, num_items: int = 0) -> bool:
         return False
     return True
 
+
+def sync_directories(dir_a: str, dir_b: str):
+    """
+    Recursively copies files/directories that exist in dir_a but not in dir_b to dir_b
+    """
+    try:
+        # Convert to Path objects for easier handling
+        src_path = Path(dir_a)
+        dst_path = Path(dir_b)
+        
+        # Walk through all files and directories in source
+        for src_file in src_path.rglob('*'):
+            # Get relative path
+            rel_path = src_file.relative_to(src_path)
+            dst_file = dst_path / rel_path
+            
+            # Skip if destination exists
+            if dst_file.exists():
+                continue
+                
+            # Create parent directories if they don't exist
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Copy file or directory
+            if src_file.is_file():
+                shutil.copy2(src_file, dst_file)
+            elif src_file.is_dir():
+                dst_file.mkdir(parents=True, exist_ok=True)
+                
+        return 0
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return -1
  
+ 
+def delete_yaml_files(directory: str) -> None:
+    """
+    Deletes only .yaml or .yml files from the specified directory.
+    """
+    if not os.path.isdir(directory):
+        print(f"Directory does not exist: {directory}")
+        return
+
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".yaml") or file.endswith(".yml"):
+                path = os.path.join(root, file)
+                os.remove(path)
+                
+                
 # Setup commands
 @task
 def create_environment(ctx: Context) -> None:
@@ -157,57 +208,53 @@ def gcloud_build_image(ctx: Context) -> None:
 
 
 @task
-def gcloud_queue(ctx,) -> None:
-    """
-    Queue config files for training in Vertex AI. Run before gcloud_train. Only 1 file can be queued at a time.
-
-    Args:
-        configname: Name of the config file.
-    """
-    
-    # Add early return if directory check fails
-    queue_dir = os.path.join("vertex_train", "queue")
-    if check_directory_contents(queue_dir, num_items=2):
-        warnings.warn("Directory has too many files. Please run gcloud-train first.")
-        return
-
-    # DVC commands
-    ctx.run("dvc add ./vertex_train", echo=True, pty=not WINDOWS)
-    ctx.run("dvc push ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
-    print("Data pushed to dvc remote.")
-
-
-@task
 def gcloud_train(ctx, machine: str = "gpu") -> None:
     """
     Run a custom training job in Vertex AI using gcloud.
 
     Args:
-        configname: Name of the config file.
         machine: Machine type, such as "cpu" or "gpu".
     """
-
-    # Add early return if directory check fails
-    ctx.run("dvc pull ./vertex_train --no-run-cache")
-    queue_dir = os.path.join("vertex_train", "queue")
-    if not check_directory_contents(queue_dir, num_items=0):
-        warnings.warn("No training job queued. Please run gcloud-queue first.")
-        return
     
+    # Add early return if directory check fails
+    queue_dir = os.path.join("vertex_train", "queue")
+    if check_directory_contents(queue_dir, num_items=2):
+        warnings.warn("Directory can only have 1 config file and 1 placeholder file.")
+        return
+
+    # Copy config files to GCS
+    ctx.run("gsutil cp ./vertex_train/queue/* gs://pet-fac-rec-bucket/vertex_train/queue/", echo=True, pty=not WINDOWS)
+    print("Config file queued successfully.")
+    
+    if machine == "cpu":
+        config = "vertex_config/vertex_set_secrets_cpu.yaml"
+    else:
+        config = "vertex_config/vertex_set_secrets_gpu.yaml"
+        
     # Submit build
     ctx.run(
-        "gcloud builds submit --config=cloudbuild.yaml . "
+        f"gcloud builds submit --config={config} . "
         "--service-account=projects/pet-fac-rec/serviceAccounts/trigger-builder@pet-fac-rec.iam.gserviceaccount.com",
         echo=True,
         pty=not WINDOWS,
     )
+    delete_yaml_files(queue_dir)
     print("Training job submitted successfully.")
 
 
 @task
 def gcloud_check(ctx: Context) -> None:
-    """Check the status of the Vertex AI jobs."""
-    ctx.run("dvc pull ./vertex_train --no-run-cache", echo=True, pty=not WINDOWS)
+    """Fetch the output of Vertex AI jobs."""
+    # Create directory if it doesn't exist
+    if not os.path.exists("vertex_temp"):
+        os.makedirs("vertex_temp")
+    ctx.run(
+        'gsutil cp -r gs://pet-fac-rec-bucket/vertex_train/completed/* ./vertex_temp/', 
+        echo=True, 
+        pty=not WINDOWS
+    )
+    sync_directories("vertex_temp", "vertex_train/completed")
+    shutil.rmtree("vertex_temp")
 
 
 @task
@@ -215,14 +262,6 @@ def gcloud_login(ctx: Context) -> None:
     """Login to gcloud."""
     ctx.run("gcloud auth application-default login", echo=True, pty=not WINDOWS)
     ctx.run("gcloud config set project pet-fac-rec", echo=True, pty=not WINDOWS)
-
-
-@task
-def gcloud_data_push(ctx: Context) -> None:
-    """Push data to dvc remote."""
-    ctx.run("dvc add ./data/")
-    ctx.run("git add ./data.dvc")
-    ctx.run("dvc push --no-run-cache", echo=True, pty=not WINDOWS)
 
 
 # Backend Tasks

@@ -1,6 +1,0 @@
-outs:
-- md5: 5e2116810e9c00bdb2e9d7220270f3ef.dir
-  size: 74
-  nfiles: 3
-  hash: md5
-  path: vertex_train

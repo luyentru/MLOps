@@ -210,5 +210,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 /data
-/vertex_train
 .env
+/vertex_train
+

@@ -44,7 +44,7 @@ ENV PATH="/root/google-cloud-sdk/bin:$PATH"
 RUN mkdir -p /workspace && chmod 755 /workspace
 
 # Copy necessary files into the container
-COPY requirements.txt pyproject.toml README.md gcloud_container_command.sh data.dvc vertex_train.dvc /workspace/
+COPY requirements.txt pyproject.toml README.md gcloud_container_command.sh /workspace/
 COPY src/ /workspace/src/
 
 # Ensure the script is executable
