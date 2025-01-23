@@ -598,7 +598,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 17 fill here ---
+--- We used the following list of services (APIs) in our development and deployment process: Vertex AI, Cloud Build, Compute Engine, IAM Service Account Credentials, Cloud Run Admin, Secret Manager, Cloud Logging, Cloud Storage. Cloud Storage was used to create a bucket as our DVC remote for our dataset. We used Cloud Build in conjunction with the Artifact Registry to build and store up-to-date docker images. Training images were deployed in Vertex AI for gpu training or Compute Engine for testing and debugging. The data and secrets are injected into training instances from Secret Manager and Cloud Storage. IAM was used to allow our different service accounts and services to be able to access each other. We also experimented with Cloud Functions to deploy and host our complete frontend and backend, but ultimately decided for Cloud Run. Cloud Logging was relied upon heavily during development for monitoring and debugging.  ---
 
 ### Question 18
 
@@ -618,7 +618,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 18 fill here ---
+--- The Compute Engine was mainly used for preliminary testing of the training images built by Cloud Build and pushed to the Artifact Registry. The containers were built on the VM and ran interactively. We then used DVC to pull the data into the container, and ran a jobscript.sh file baked into the image for the training commands. The bash file also handles transferring results and models into Cloud Storage. As we did not apply for GPU access for the Compute Engine (we did so for Vertex), the VM instance was an n2-standard-2 CPU. A challenge of note was  the default disk size of the VM of 10GB, which was not able to fit our image. This had to be later increased to 50 for full scale testing.  ---
 
 ### Question 19
 
@@ -668,7 +668,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 22 fill here ---
+--- We managed to train our model using both the Compute Engine and Vertex AI. Vertex AI was mainly used for heavy training jobs as it can handle more than the CPU allocated to our Compute Engine VMs. The training workflow is called by an invoke function which firstly copies the training config file onto the gcloud bucket. It then submits a request to Cloud Build to inject our WandB key into a config file, which is also submitted to Vertex AI. This is derivative of the implementation shown in the vertex_ai_train.yaml file in M21. The container in Vertex AI has an entrypoint set to a bash script. This bash script handles the copying of data and config files into the container instance, runs the training, syncs progress with WandB, and finally outputs the finished logs, figures and model onto the gcloud bucket. We also implemented an invoke function to pull the results onto our local devices.  ---
 
 ## Deployment
 
@@ -789,7 +789,7 @@ The metrics (along with some standard metrics) can be obtained publicly via our 
 
 > Answer:
 
---- question 27 fill here ---
+--- In total we ended up using $7.16 of credits. All were attributed to the group member in charge of setting up gcloud. The breakdown is as follows: Compute Engine with $2.92, Artifact Registry with $2.14, Cloud Run with $0.93, Vertex AI with $0.69, 1 instance of Container Registry Vulnerability Scanning with $0.26, Cloud Storage with $0.15, and Networking with $0.08. Compute Engine cost the most as running training tests on the CPU was quite unoptimized, and the instance was sometimes left running overnight. Working on the cloud has a high learning curve, and makes debugging extremely clunky. The vast functionality of the cloud makes finding relevant documentation and solutions to bugs unintuitive, as iterating on fixes often feels unnecessarily complex and slow when compared to doing them locally. ---
 
 ### Question 28
 
