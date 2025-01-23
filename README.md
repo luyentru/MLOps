@@ -4,8 +4,8 @@
 
 We have deployed our application via Cloud Run (Google Cloud) and it should be accessible via the following links:
 
-Frontend: https://frontend-image-73164234676.europe-west1.run.app/
-Backend: https://backend-bento-73164234676.europe-west1.run.app/
+- Frontend: https://frontend-image-73164234676.europe-west1.run.app/
+- Backend: https://backend-bento-73164234676.europe-west1.run.app/
 
 ## Authors
 - Beat Weichsler (s244469)
