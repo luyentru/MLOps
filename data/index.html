@@ -1007,7 +1007,7 @@ Downloads the dataset if not already present and generates a CSV file.</p>
 <span class="sd">    Preprocess the raw data and save it to the output folder.</span>
 <span class="sd">    Downloads the dataset if not already present and generates a CSV file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Preprocessing data...&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preprocessing data...&quot;</span><span class="p">)</span>
 
     <span class="c1"># Ensure the output folder exists</span>
     <span class="n">output_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1052,7 +1052,7 @@ Downloads the dataset if not already present and generates a CSV file.</p>
     <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]:</span>
         <span class="n">split_path</span> <span class="o">=</span> <span class="n">output_folder</span> <span class="o">/</span> <span class="n">split</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">split_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: Split folder &#39;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">&#39; not found in </span><span class="si">{</span><span class="n">output_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: Split folder &#39;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">&#39; not found in </span><span class="si">{</span><span class="n">output_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="k">for</span> <span class="n">label_dir</span> <span class="ow">in</span> <span class="n">split_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">label_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
