@@ -1,5 +1,6 @@
 lr: 0.001
 batch_size: 16
 epochs: 5
+dropout: 0.2
 data_csv: "data/data.csv"
 seed: 42
