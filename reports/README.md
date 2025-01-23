@@ -476,7 +476,9 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 
 > Answer:
 
---- question 12 fill here ---
+--- We keep our config files in a folder `src/pet_fac_rec/configs`. It has a main `config.yaml` where we define default experiment and an experiments subfolder for each specific setup. These files set stuff like learning rate, batch size, epochs, dropout, a fixed seed for consistency, and the path for training data. To run an experiment, there are several ways, below is one example: 
+
+`python src/pet_fac_rec/train.py experiment=exp1`---
 
 ### Question 13
 
@@ -496,7 +498,7 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 
 > Answer:
 
---- question 13 fill here ---
+--- To ensure no information is lost and that our experiments are reproducible, we implemented robust logging within our code. Each time an experiment is run, the configuration settings are automatically logged along with the timestamp of the run. This includes not only the hyperparameters but also other training metrics like training and validation loss, as well as accuracy. Furthermore, to guarantee the reproducibility of our experiments, we carefully set a predefined seed in all the necessary components of our model training process. This approach ensures that every experiment can be consistently replicated under the same conditions, eliminating variations due to random processes. ---
 
 ### Question 14
 
@@ -516,7 +518,8 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 
 > Answer:
 
---- question 14 fill here ---
+--- We had to manually adjust hyperparameters as we could not set up the Wandb sweeping to work with Hydra. We created and ran eight distinct experiments and monitored each one in the Wandb web interface. In the [screenshot](figures/wandb.png), you can see we logged training and validation losses, as well as accuracies for each run of the experiment. Training and validation loss track the model's learning process, with a decreasing value indicating the model's ability to learn over time, while accuracy gave us a clear picture of whether it was actually getting better at making the right predictions. Some models showed clear signs of both overfitting and underfitting. From the eight experiments, we selected the model with the highest validation accuracy and evaluated it on the test dataset, yielding around 40% accuracy, which is relatively low and indicates substantial room for improvement.
+Future work could benefit from more advanced techniques like Bayesian optimization or automated sweeps. The bad performance could also be attributed to the training dataset size. It contains only 1075 training samples, so expanding the dataset by gathering additional images could significantly improve model performance and generalization.Lastly, implementing image augmentation techniques could help increase the effective size and diversity of our training data. ---
 
 ### Question 15
 
