@@ -879,4 +879,10 @@ Overall, we tried to implement all main aspects of the course and our pipeline i
 
 > Answer:
 
---- question 31 fill here --
+--- Generally, we mostly met up to work together, but we did work along the checklist where each of us took the main responsibility over certain tasks. The main tasks where divided as follows: 
+Student s243416 set up the GitHub repository and the initial cookiecutter project. They also implemented the first models (which later got improved), build the docker files, setup the config-files, implemented logging, implemented W&B, and added a continuous workflow for the model registry. 
+Student s242926 improved the implemented model, pre-processed the data, added command line interfaces, build docker files, implemented loggers and pytorch-lightning (which we did not push to the main-branch in the end), implemented the pre-commit hooks and the FastAPI incl. the API tests and load testing and added the documentation to GitHub Pages incl. the architecture diagram. 
+Student s244469 constructed docker files, wrote the unit tests (model construction + training), calculated the code coverage, implemented continuous integration, added testing and linting, implemented the BentoML API incl. the frontend and added some system metrics to it. 
+Student s241961 implemented the original data pre-processing, setup version control, created the data storage using the GCP bucket, setup the workflow for docker images, implemented the model training using Vertex AI, and deployed the model using GCP. 
+
+Each feature got an own branch on our repository and if we were done with an implementation we made a pull request which had to be approved by a team member. This way we ensured that the implemented changes properly worked and were not dependent on the local setup of the person who implemented it. If two people worked together on a feature, a third person would test the implementation before merging. We used GitHub Copilot and ChatGPT for debugging, code improvement + cleanup, code writing and research. ---
