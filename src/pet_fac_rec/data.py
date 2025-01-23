@@ -80,7 +80,7 @@ def preprocess(output_folder: Path) -> None:
     Preprocess the raw data and save it to the output folder.
     Downloads the dataset if not already present and generates a CSV file.
     """
-    print("Preprocessing data...")
+    log.info("Preprocessing data...")
 
     # Ensure the output folder exists
     output_folder.mkdir(parents=True, exist_ok=True)
@@ -125,7 +125,7 @@ def preprocess(output_folder: Path) -> None:
     for split in ["train", "valid", "test"]:
         split_path = output_folder / split
         if not split_path.exists():
-            print(f"Warning: Split folder '{split}' not found in {output_folder}")
+            log.info(f"Warning: Split folder '{split}' not found in {output_folder}")
             continue
         for label_dir in split_path.iterdir():
             if label_dir.is_dir():
@@ -151,13 +151,13 @@ def dataset_statistics(datadir: str = "data/data.csv") -> None:
     """Compute dataset statistics."""
     train_dataset = MyDataset(csv_file=Path(datadir), split="train")
     test_dataset = MyDataset(csv_file=Path(datadir), split="test")
-    print(f"Train dataset: {train_dataset.name}")
-    print(f"Number of images: {len(train_dataset)}")
-    print(f"Image shape: {train_dataset[0][0].shape}")
-    print("\n")
-    print(f"Test dataset: {test_dataset.name}")
-    print(f"Number of images: {len(test_dataset)}")
-    print(f"Image shape: {test_dataset[0][0].shape}")
+    log.info(f"Train dataset: {train_dataset.name}")
+    log.info(f"Number of images: {len(train_dataset)}")
+    log.info(f"Image shape: {train_dataset[0][0].shape}")
+    log.info("\n")
+    log.info(f"Test dataset: {test_dataset.name}")
+    log.info(f"Number of images: {len(test_dataset)}")
+    log.info(f"Image shape: {test_dataset[0][0].shape}")
 
     show_image_and_target(train_dataset.images[:25], train_dataset.target[:25], show=False)
     plt.savefig("pet_facial_expressions.png")

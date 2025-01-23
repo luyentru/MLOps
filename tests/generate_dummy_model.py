@@ -41,7 +41,6 @@ def generate_dummy_model(num_classes: int, model_path: str):
             state_dict[key] = torch.randn_like(value)
     model.load_state_dict(state_dict)
 
-    print(f"Generated Dummy Model State Dict Keys: {list(state_dict.keys())}")
     torch.save(model.state_dict(), model_path)
     print(f"Dummy model saved to {model_path}")
 
