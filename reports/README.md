@@ -214,7 +214,7 @@ are using (M2+M6)
 
 > Answer:
 
---- For the project, we chose to work with torchvision, a package not covered extensively in our course. Torchvision is part of the PyTorch ecosystem and offers a range of pre-trained models, including EfficientNet, ResNet, and VGG, which we utilized to significantly expedite our model development process. By leveraging these pre-trained models, we were able to implement state-of-the-art architectures for our tasks without having to train them from scratch, which saved us a lot of time. ---
+--- For the project, we chose to work with torchvision, a package not covered extensively in our course. Torchvision is part of the PyTorch ecosystem and offers a range of pre-trained models, including EfficientNet, ResNet, and VGG, which we utilized to significantly expedite our model development process. By leveraging these pre-trained models, we were able to implement state-of-the-art architectures for our tasks without having to train them from scratch, which saved us a lot of time. Due to limited time, we only managed to fine-tune the pretrained EffiecientNet model. The model was well suited for our problem.---
 
 ## Coding environment
 
@@ -348,17 +348,7 @@ These practices matter in larger projects because:
 > Answer:
 
 --- 
-In total we have implemented 5 tests.
-
-1. `test_model_speed`: This test is designed to validate the continuous integration workflow on GitHub, ensuring that any changes to the model code trigger the workflow to verify model prediction speeds under specific conditions.
-
-2. `test_dataset_download`: This test ensures the functionality of dataset handling, including data downloading, preprocessing, and integrity. The tests ensure that data files are not empty, that required directories and labels exist, and that the structure of the dataset (e.g., train, valid, test splits) is correct. It also checks for the existence of expected data columns in a CSV file.
-
-3. `test_efficientnet_model_init`: This test checks that the initialized model has the correct number of output classes.
-
-4. `test_efficientnet_forward_pass`: This test verifies the model's forward pass by creating a sample input and running it through the model to check the output shape and type. It ensures the output tensor is correctly sized for the batch and class dimensions, and checks that the output is indeed a PyTorch tensor.
-
-5. `test_efficientnet_pretrained_parameter`: This test checks both the pretrained and non-pretrained initialization options of the model to confirm they are instances of the specified model class. ---
+In total we implemented 5 tests. `test_model_speed` validates the continuous integration workflow on GitHub; `test_dataset_download` ensures the functionality of dataset handling; `test_efficientnet_model_init` checks that the initialized model has the correct number of output classes; `test_efficientnet_forward_pass` verifies the model's forward pass by creating a sample input and running it through the model; and `test_efficientnet_pretrained_parameter` checks both the pretrained and non-pretrained initialization options of the model. ---
 
 ### Question 8
 
@@ -448,9 +438,15 @@ The `main` branch contains all production-ready code. We push only from `develop
 
 > Answer:
 
---- We run a comprehensive CI pipeline through GitHub Actions with two primary workflows - testing and linting. Our testing workflow executes unit tests across Ubuntu, Windows, and macOS using Python 3.11, incorporating code coverage reporting through coverage and pytest. We effectively use pip dependency caching for all our requirements files to optimize build times.
+--- We run a comprehensive continuous integration (CI) pipeline through GitHub Actions with four primary workflows - testing, linting, documentation deploying, and model staging. 
 
-For code quality, we maintain a separate linting workflow using pylint with a strict minimum score requirement of 8.0/10. Both workflows trigger automatically on pushes and pull requests to our main and development branches, ensuring consistent code quality across all contributions.
+1. Our testing workflow executes unit tests across Ubuntu, Windows, and macOS using Python 3.11, incorporating code coverage reporting through coverage and pytest. We effectively use pip dependency caching for all our requirements files to optimize build times.
+
+2. For code quality, we maintain a separate linting workflow using pylint with a strict minimum score requirement of 8.0/10. Both workflows trigger automatically on pushes and pull requests to our main and development branches, ensuring consistent code quality across all contributions.
+
+3. To publish the documentation of our code, we use an mkdocs.yaml file and then use a GitHub workflow that automatically pushes the documentation on to GitHub pages. This documentation includes a main overview of our project and also includes our architecture diagram. 
+
+4. For model staging, the workflow gets triggered when a change has been made to the model. This includes any new model being exported into the models folder on the main branch.
 
 Currently, we only test on Python version 3.11, however that could easily be extend to younger or older versions if necessary for the project. ---
 
@@ -518,8 +514,10 @@ Currently, we only test on Python version 3.11, however that could easily be ext
 
 > Answer:
 
---- We had to manually adjust hyperparameters as we could not set up the Wandb sweeping to work with Hydra. We created and ran eight distinct experiments and monitored each one in the Wandb web interface. In the [screenshot](figures/wandb.png), you can see we logged training and validation losses, as well as accuracies for each run of the experiment. Training and validation loss track the model's learning process, with a decreasing value indicating the model's ability to learn over time, while accuracy gave us a clear picture of whether it was actually getting better at making the right predictions. Some models showed clear signs of both overfitting and underfitting. From the eight experiments, we selected the model with the highest validation accuracy and evaluated it on the test dataset, yielding around 40% accuracy, which is relatively low and indicates substantial room for improvement.
-Future work could benefit from more advanced techniques like Bayesian optimization or automated sweeps. The bad performance could also be attributed to the training dataset size. It contains only 1075 training samples, so expanding the dataset by gathering additional images could significantly improve model performance and generalization.Lastly, implementing image augmentation techniques could help increase the effective size and diversity of our training data. ---
+--- We had to manually adjust hyperparameters as we could not set up the Wandb sweeping to work with Hydra. We created and ran eight distinct experiments and monitored each one in the Wandb web interface. In the figure, you can see we logged training and validation losses, as well as accuracies for each run of the experiment. Training and validation loss track the model's learning process, with a decreasing value indicating the model's ability to learn over time, while accuracy gave us a clear picture of whether it was actually getting better at making the right predictions. Some models showed clear signs of both overfitting and underfitting. From the eight experiments, we selected the model with the highest validation accuracy and evaluated it on the test dataset, yielding around 40% accuracy, which is relatively low and indicates substantial room for improvement.
+Future work could benefit from more advanced techniques like Bayesian optimization or automated sweeps. The bad performance could also be attributed to the training dataset size. It contains only 1075 training samples, so expanding the dataset by gathering additional images could significantly improve model performance and generalization.Lastly, implementing image augmentation techniques could help increase the effective size and diversity of our training data. 
+
+![screenshot](figures/wandb.png) ---
 
 ### Question 15
 
@@ -720,7 +718,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 3. docker tag frontend-image europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/frontend-image:latest docker push europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/frontend-image:latest
 4. docker tag bento-image europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/backend-bento:latest docker push europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/backend-bento:latest
 
-Afterwards, we started one docker container for each image in Cloud Run. ---
+After that, we started one docker container for each image in Cloud Run. ---
 
 ### Question 25
 
