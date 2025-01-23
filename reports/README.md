@@ -710,7 +710,14 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 24 fill here ---
+--- We used the bentoml api for our “production” setting and deployed this also in the cloud. We built two containers, one for the backend with our bentoml api, and one for our frontend using streamlit. Both docker images were built locally for linux/amd64 and then pushed to the cloud:  
+
+1. “docker build --platform linux/amd64 -f dockerfiles/frontend.dockerfile -t frontend-image ."
+2. "docker build --platform linux/amd64 -t bento-image -f dockerfiles/bento.dockerfile ."
+3. docker tag frontend-image europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/frontend-image:latest docker push europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/frontend-image:latest
+4. docker tag bento-image europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/backend-bento:latest docker push europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/backend-bento:latest
+
+Afterwards, we started one docker container for each image in Cloud Run. ---
 
 ### Question 25
 
