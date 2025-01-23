@@ -418,7 +418,7 @@ The `main` branch contains all production-ready code. We push only from `develop
 
 > Answer:
 
---- question 10 fill here ---
+--- Yes, DVC was used to sync our local data with the remote storage in the gcloud bucket. It allowed us to sync data changes to those in the bucket, which was what we used for training on Vertex AI. This enabled us to decouple the data from the training images, avoiding the need to rebuild the training image each time the data was updated. However, we encountered problems while puling data into new environments using dvc pull, as there was an issue with the cache being out of sync. While the implementation of DVC did not improve our project by much due to there being no changes to our data, it provides a robust solution for continuous development of models in a production environment with dynamic datasets. ---
 
 ### Question 11
 
@@ -629,7 +629,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 19 fill here ---
+--- ![Bucket](figures/bucket.png) ---
 
 ### Question 20
 
@@ -639,7 +639,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 20 fill here ---
+--- ![Registry](registry/registry.png) ---
 
 ### Question 21
 
@@ -649,7 +649,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 21 fill here ---
+--- ![Build page 1](figures/build_1.png) ![Build page 2](figures/build_2.png) ---
 
 ### Question 22
 
