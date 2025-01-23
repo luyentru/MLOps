@@ -861,7 +861,11 @@ Overall, we tried to implement all main aspects of the course and our pipeline i
 
 > Answer:
 
---- question 30 fill here ---
+--- One major struggle we had was getting the different containers to communicate with each other. Locally, the frontend would send requests to localhost:5000, but as soon as we deployed to the cloud, that would not work anymore. We ended up with a version that would try to fetch a API URL for a backend container if available on the cloud and return the localhost:5000 otherwise. This way, our code is able to create working container set-ups locally and in the cloud.
+
+A challenge we faced was with setting up dvc to sync correctly, as the data was unable to be pulled into a new environment even with the correct dvc file being imported, citing a cache mismatch. This prompted a workaround using gsutil copy for our Vertex AI runs to inject the data for training. This, combined with the hard-to-iterate nature of the cloud setup made debugging very slow. Any update made to the training code, requirements, or entrypoint bash script required a new image to be built, debugged on console, then deployed on vertex which incurred long wait times. This necessitated an approach where changes had to be checked thoroughly before being tested on the cloud to minimize iterating. 
+
+While reviewing the initial project description, we found that the plan was to focus more on the model and improving its performance, but more time was spent on setting up the infrastructure around the model than expected.  ---
 
 ### Question 31
 
