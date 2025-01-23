@@ -812,7 +812,12 @@
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>
     <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="s2">&quot;efficientnet&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Model type to use (&#39;efficientnet&#39;, &#39;resnet50&#39;, &#39;vgg16&#39;)&quot;</span><span class="p">),</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
@@ -842,7 +847,12 @@
         <span class="n">entity</span><span class="o">=</span><span class="n">WANDB_ENTITY</span><span class="p">,</span>
         <span class="n">job_type</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;exp_</span><span class="si">{</span><span class="n">current_time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span> <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">epochs</span><span class="p">},</span>
+        <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span>
+            <span class="s2">&quot;dropout&quot;</span><span class="p">:</span> <span class="n">hparams</span><span class="o">.</span><span class="n">dropout</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">)</span>
 
     <span class="c1"># Load the dataset</span>
@@ -854,7 +864,7 @@
 
     <span class="c1"># Initialize the model</span>
     <span class="n">num_classes</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">num_classes</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">hparams</span><span class="o">.</span><span class="n">dropout</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># Define loss function and optimizer</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
