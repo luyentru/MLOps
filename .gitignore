@@ -17,6 +17,8 @@ lightning_logs/
 # Allow specific .png files in the docs folder
 !docs/source/images/architecture.png
 !docs/source/images/training_statistics.png
+!reports/figures/architecture.png
+!reports/figures/training_statistics.png
 
 # Ignore pretrained models
 models/
