@@ -728,7 +728,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 25 fill here ---
+--- We implemented both unit testing and load testing for our FastAPI implementation to ensure its reliability. For unit testing, we used FrastAPI’s test client along with a test image that was randomly chosen by us out of the test set. For load testing, we used the locust framework with http-users to simulate traffic and the same test image for consistency. Our load testing confirmed that the API worked for up to 20 users (with a spawn rate of three), but we did not test the API until it crashed. We could test that by increasing the number of users and increasing the spawn rate until the API reaches its breaking point.   ---
 
 ### Question 26
 
