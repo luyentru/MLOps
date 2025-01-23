@@ -688,7 +688,7 @@ Link to train.dockerfile: https://github.com/luyentru/MLOps/blob/main/dockerfile
 
 > Answer:
 
---- question 23 fill here ---
+--- We managed to implement two APIs for our model. Initially, we used FastAPI to do inference on our model and implemented API tests to integrate them into our continuous integration pipeline. We also load tested our application by using the locust framework to observe how the application performs under higher traffic. Afterwards, we used BentoML to create a more specialized ML-deployment API, utilizing ONNX models as suggested in the exercises. To improve the user experience we also added a frontend for our application using streamlit. This API was also tested with several images of pets that were not part of the data set.  ---
 
 ### Question 24
 
