@@ -6,9 +6,19 @@ workerPoolSpecs:
         acceleratorCount: 1
     replicaCount: 1
     containerSpec:
-        imageUri: IMAGE_URI
+        imageUri: "europe-west1-docker.pkg.dev/pet-fac-rec/pet-fac-rec-image-storage/train_gpu:latest"
         env:
         - name: STORAGE_URI
-          value: STORAGE_URI
-        - name: CONFIG_NAME
-          value: CONFIG_NAME
+          value: gs://pet-fac-rec-bucket
+        - name: WANDB_PROJECT
+          value: pet_fac_rec
+        - name: WANDB_ENTITY
+          value: luyentrungkien00-danmarks-tekniske-universitet-dtu
+        - name: WANDB_ENTITY_ORG
+          value: luyentrungkien00-danmarks-tekniske-universitet-dtu-org
+        - name: WANDB_REGISTRY
+          value: wandb-registry-model
+        - name: WANDB_COLLECTION
+          value: pet-fac-rec-model
+        - name: WANDB_API_KEY
+          value: $WANDB_API_KEY
