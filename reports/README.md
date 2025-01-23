@@ -809,7 +809,7 @@ The metrics (along with some standard metrics) can be obtained publicly via our 
 
 > Answer:
 
---- question 28 fill here ---
+--- We implemented a frontend to our BentoML API to make it more user-friendly. We also instrumented the API with some system metrics. We added some documentation and published that on GitHub pages to be easily accessible and visible to users. One thing that we implemented but did not merge into the main branch is the pytorch-lightning implementation to reduce boilerplate. The implementation worked but as it added more functions and as our old implementation was more straight-forward, we decided to keep it. The pytorch-lightning implementation can be found on the corresponding branch. ---
 
 ### Question 29
 
