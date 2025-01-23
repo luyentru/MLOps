@@ -5,14 +5,21 @@ import streamlit as st
 
 
 def get_backend_url():
-    """Get the URL of the backend service."""
-    parent = "projects/pet-fac-rec/locations/europe-west1"
-    client = run_v2.ServicesClient()
-    services = client.list_services(parent=parent)
-    for service in services:
-        if service.name.split("/")[-1] == "backend-bento":
-            return service.uri
-    return None
+    """
+    Get the URL of the backend service.
+    Works for Google Cloud setup (if backend container is running) and locally (via backend:5000)
+    """
+
+    try:
+        parent = "projects/pet-fac-rec/locations/europe-west1"
+        client = run_v2.ServicesClient()
+        services = client.list_services(parent=parent)
+        for service in services:
+            if service.name.split("/")[-1] == "backend-bento":
+                return service.uri
+    except Exception:
+        print("container cannot find backend on gcloud, trying local docker network (backend:5000)")
+        return "http://backend:5000"
 
 
 def classify_image(image, backend):
