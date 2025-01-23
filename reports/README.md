@@ -380,7 +380,9 @@ In total we have implemented 5 tests.
 
 > Answer:
 
---- question 8 fill here ---
+--- The total coverage of our code is 12% as calculated by ‘coverage report’. Some of our files have higher coverage like api.py with 84% (we tested this one extensively as part of the API testing exercise), but others have very little coverage. This is fine, as we could easily write more unit tests to increase the code coverage.
+
+Even with 100% code coverage we can however not be sure that the code works together, as the tests might miss scenarios that are relevant or the integration of different units is not working. It is therefore a good way to increase security, but it is not a guarantee for bug-free code.  ---
 
 ### Question 9
 
