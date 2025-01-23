@@ -60,12 +60,12 @@ def set_seed(seed_value=42):
     torch.backends.cudnn.benchmark = False
 
 
-def get_model(model_name: str, num_classes: int) -> torch.nn.Module:
+def get_model(model_name: str, num_classes: int, dropout: float) -> torch.nn.Module:
     """
     Returns the model based on the model name.
     """
     if model_name == "efficientnet":
-        return MyEfficientNetModel(num_classes=num_classes)
+        return MyEfficientNetModel(num_classes=num_classes, dropout_rate=dropout)
     elif model_name == "resnet50":
         return MyResNet50Model(num_classes=num_classes)
     elif model_name == "vgg16":
@@ -199,7 +199,12 @@ def train(
         entity=WANDB_ENTITY,
         job_type="train",
         name=f"exp_{current_time}",
-        config={"lr": hparams.lr, "batch_size": hparams.batch_size, "epochs": hparams.epochs},
+        config={
+            "lr": hparams.lr,
+            "batch_size": hparams.batch_size,
+            "epochs": hparams.epochs,
+            "dropout": hparams.dropout,
+        },
     )
 
     # Load the dataset
@@ -211,7 +216,7 @@ def train(
 
     # Initialize the model
     num_classes = train_dataset.num_classes
-    model = get_model(model_name, num_classes).to(device)
+    model = get_model(model_name, num_classes, hparams.dropout).to(device)
 
     # Define loss function and optimizer
     criterion = torch.nn.CrossEntropyLoss()
