@@ -28,47 +28,73 @@ To achieve the project goals, we utilize PyTorch Image Models (TIMM) [\[2\]](#re
 
 The directory structure of the project looks like this:
 ```txt
-├── .github/                  # Github actions and dependabot
+├── .github/                  
 │   ├── dependabot.yaml
 │   └── workflows/
 │       └── tests.yaml
-├── configs/                  # Configuration files
-├── data/                     # Data directory
-│   ├── processed
-│   └── raw
-├── dockerfiles/              # Dockerfiles
+│       └── deploy_docs.yaml
+│       └── stage_model.yaml
+│       └── lint.yaml
+├── data/                     
+│   ├── data.csv
+│   └── test
+│   └── train
+│   └── valid
+├── dockerfiles/              
 │   ├── api.Dockerfile
 │   └── train.Dockerfile
-├── docs/                     # Documentation
+│   ├── bento.Dockerfile
+│   └── frontend.Dockerfile
+│   └── train_gcloud.Dockerfile
+├── docs/                     
 │   ├── mkdocs.yml
 │   └── source/
 │       └── index.md
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks
-├── reports/                  # Reports
+├── models/                   
+├── reports/                 
 │   └── figures/
-├── src/                      # Source code
-│   ├── project_name/
+│   └── report.py
+│   └── README.md
+├── src/                      
+│   ├── pet_fac_rec/
+│   │   ├── configs/
+│   │   │   ├── config.yaml
+│   │   │   ├── experiments/
 │   │   ├── __init__.py
 │   │   ├── api.py
 │   │   ├── data.py
 │   │   ├── evaluate.py
-│   │   ├── models.py
+│   │   ├── model.py
+│   │   ├── preprocessing.py
 │   │   ├── train.py
+│   │   ├── utils.py
 │   │   └── visualize.py
-└── tests/                    # Tests
-│   ├── __init__.py
-│   ├── test_api.py
-│   ├── test_data.py
-│   └── test_model.py
+│   ├── streamlit/
+│   │   └── frontend.py
+└── tests/                    
+│   ├── integrationtests/
+│   ├── performancetests/
+│   ├── unittests/
+│   ├── generate_dummy_model.py
+│   └── testimage_happy.jpg
 ├── .gitignore
+├── .coveragerc
+├── .glcoudignore
+├── .dvcignore
 ├── .pre-commit-config.yaml
 ├── LICENSE
-├── pyproject.toml            # Python project file
-├── README.md                 # Project README
-├── requirements.txt          # Project requirements
-├── requirements_dev.txt      # Development requirements
-└── tasks.py                  # Project tasks
+├── cloudbild.yaml           
+├── data.dcv         
+├── gcloud_container_command.sh     
+├── pyproject.toml            
+├── README.md                 
+├── requirements.txt          
+├── requirements_dev.txt
+├── requirements_frontend.txt
+├── requirements_bentoapi.txt
+├── requirements_gpu.txt
+├── requirements_tests.txt  
+└── tasks.py                 
 ```
 
 Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
