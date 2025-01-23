@@ -267,8 +267,10 @@ def runstreamlitcontainer(ctx: Context, name: str = "frontend") -> None:
 # Make sure to delete any containers named "frontend" or "backend" before running
 @task
 def runfrontendbackend(ctx: Context) -> None:
-    # Create Docker Network
-    ctx.run("docker network create pet_fac_network")
+    # Create Docker Network if it doesn't exist
+    result = ctx.run("docker network ls --filter name=pet_fac_network --format '{{.Name}}'", hide=True)
+    if "pet_fac_network" not in result.stdout:
+        ctx.run("docker network create pet_fac_network")
 
     # Run Backend Tasks
     def run_backend():
