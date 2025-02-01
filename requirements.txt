@@ -47,7 +47,7 @@ prometheus_client==0.21.1
 pydantic==2.10.5
 pydantic_core==2.27.2
 Pygments==2.19.1
-pylint==3.3.3
+pylint==3.3.4
 pyparsing==3.2.1
 pytest==8.3.4
 python-dateutil==2.9.0.post0
